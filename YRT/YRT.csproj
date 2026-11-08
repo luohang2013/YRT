@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>YRT</RootNamespace>
+    <AssemblyName>YRT</AssemblyName>
+    <ApplicationIcon>..\..\assets\yrt.ico</ApplicationIcon>
+    <Version>0.4.0</Version>
+    <Product>YHCT 的资源包工具箱 (YiHangCT)</Product>
+    <Description>资源包生成 / 混搭 / 分析 / 安装工具箱（YiHangCT 出品）</Description>
+  </PropertyGroup>
+
+  <!-- WinForms 仅用于取色器，去掉隐式 using 避免与 WPF 类型冲突 -->
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 首次运行要解压到 data\ 的内置资源 -->
+    <EmbeddedResource Include="Resources\welcome.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 顶栏 Logo 与窗口图标 -->
+    <Resource Include="Resources\logo.png" />
+    <!-- 关于页作者简介头像 -->
+    <Resource Include="Resources\author.png" />
+  </ItemGroup>
+
+</Project>

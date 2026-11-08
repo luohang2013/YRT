@@ -1,0 +1,136 @@
+﻿<Window x:Class="YRT.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding ApplicationName}" Height="640" Width="1000"
+        MinHeight="520" MinWidth="820"
+        WindowStartupLocation="CenterScreen"
+        Icon="Resources/logo.png"
+        Background="{DynamicResource BackgroundBrush}">
+    <Window.Resources>
+        <!-- 导航字体 -->
+        <FontFamily x:Key="IconFont">Segoe MDL2 Assets</FontFamily>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- 顶部栏：Logo + 图标标签导航 -->
+        <Border Grid.Row="0" Background="{DynamicResource CardBrush}"
+                BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,1"
+                Padding="18,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Logo 图 + 标题 -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="36" Height="36" CornerRadius="9"
+                            BorderBrush="{DynamicResource DividerBrush}" BorderThickness="1"
+                            Background="White">
+                        <Image Source="Resources/logo.png" Stretch="Uniform" Margin="2" />
+                    </Border>
+                    <StackPanel VerticalAlignment="Center" Margin="10,0,22,0">
+                        <TextBlock Text="{Binding ApplicationName}" FontSize="15" FontWeight="Bold"
+                                   Foreground="{DynamicResource TextBrush}" />
+                        <TextBlock Text="YiHangCT · Minecraft 资源包工具" FontSize="10"
+                                   Foreground="{DynamicResource SubTextBrush}"
+                                   Margin="0,-1,0,0" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- 顶部标签导航（图标 + 文字） -->
+                <ListBox x:Name="NavList" Grid.Column="1"
+                         ItemsSource="{Binding NavItems}"
+                         SelectedIndex="{Binding SelectedNavIndex, Mode=TwoWay}"
+                         HorizontalAlignment="Right"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         SelectionChanged="NavList_SelectionChanged">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                            <Setter Property="FontSize" Value="13.5" />
+                            <Setter Property="FontWeight" Value="Medium" />
+                            <Setter Property="Cursor" Value="Hand" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="bd" CornerRadius="9"
+                                                BorderBrush="Transparent" BorderThickness="1"
+                                                Padding="14,6" Margin="3,0">
+                                            <Grid>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock x:Name="glyph" Text="{Binding Glyph}"
+                                                               FontFamily="{StaticResource IconFont}"
+                                                               FontSize="15" Margin="0,1,7,0"
+                                                               VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding Title}"
+                                                               VerticalAlignment="Center" />
+                                                </StackPanel>
+                                                <!-- 选中指示条：底部主题色圆角短条，渐现 -->
+                                                <Border x:Name="ind" Height="3" Width="18"
+                                                        CornerRadius="1.5" Opacity="0"
+                                                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                                                        Margin="0,0,0,-2"
+                                                        Background="{DynamicResource PrimaryBrush}" />
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="bd" Property="Background"
+                                                        Value="{DynamicResource HoverBrush}" />
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="bd" Property="Background"
+                                                        Value="{DynamicResource PrimarySoftBrush}" />
+                                                <Setter TargetName="bd" Property="BorderBrush"
+                                                        Value="{DynamicResource PrimaryBrush}" />
+                                                <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}" />
+                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                                <Trigger.EnterActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <DoubleAnimation Storyboard.TargetName="ind"
+                                                                             Storyboard.TargetProperty="Opacity"
+                                                                             To="1" Duration="0:0:0.15" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </Trigger.EnterActions>
+                                                <Trigger.ExitActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <DoubleAnimation Storyboard.TargetName="ind"
+                                                                             Storyboard.TargetProperty="Opacity"
+                                                                             To="0" Duration="0:0:0.15" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </Trigger.ExitActions>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+            </Grid>
+        </Border>
+
+        <!-- 页面区域（切换时带淡入+上移动画） -->
+        <ContentControl x:Name="PageHost" Grid.Row="1" Content="{Binding Current.Page}" Margin="24,20"
+                        RenderTransformOrigin="0.5,0.5">
+            <ContentControl.RenderTransform>
+                <TranslateTransform x:Name="PageShift" Y="0" />
+            </ContentControl.RenderTransform>
+        </ContentControl>
+    </Grid>
+</Window>

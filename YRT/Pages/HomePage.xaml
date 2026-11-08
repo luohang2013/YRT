@@ -1,0 +1,184 @@
+﻿<UserControl x:Class="YRT.Pages.HomePage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <FontFamily x:Key="IconFont">Segoe MDL2 Assets</FontFamily>
+        <!-- Hero 主色渐变（跟随主题主色联动） -->
+        <LinearGradientBrush x:Key="HeroBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="{DynamicResource PrimaryColor}" Offset="0" />
+            <GradientStop Color="{DynamicResource PrimaryPressedColor}" Offset="1" />
+        </LinearGradientBrush>
+    </UserControl.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel MaxWidth="1100">
+
+            <!-- ===== Hero 欢迎卡 ===== -->
+            <Border Background="{DynamicResource HeroBrush}"
+                    CornerRadius="16" Padding="28,24" Margin="0,0,0,14" ClipToBounds="True">
+                <Grid>
+                    <!-- 装饰圆（低透明白，增强层次） -->
+                    <Ellipse Width="220" Height="220" Margin="0,-140,-60,-190"
+                             HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                             Fill="{DynamicResource OverlaySoftBrush}" IsHitTestVisible="False" />
+                    <Ellipse Width="120" Height="120" Margin="0,-40,150,0"
+                             HorizontalAlignment="Right" VerticalAlignment="Top"
+                             Fill="{DynamicResource OverlaySoftBrush}" IsHitTestVisible="False" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="{Binding DataContext.ApplicationName, RelativeSource={RelativeSource AncestorType=Window}}"
+                                       FontSize="22" FontWeight="Bold"
+                                       Foreground="{DynamicResource OnPrimaryBrush}" />
+                            <TextBlock Text="资源包 生成 · 混搭 · 分析 · 安装，一站式搞定 Minecraft 材质"
+                                       FontSize="13" Foreground="{DynamicResource OnPrimarySubBrush}" Margin="0,6,0,0" />
+                            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                                <Button Style="{StaticResource HeroButton}" Command="{Binding PackNowCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE8B7;" FontFamily="{StaticResource IconFont}" FontSize="14"
+                                                   VerticalAlignment="Center" Margin="0,1,7,0" />
+                                        <TextBlock Text="开始打包材质" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource HeroButton}" Margin="10,0,0,0"
+                                        Command="{Binding OpenMixerCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE71D;" FontFamily="{StaticResource IconFont}" FontSize="14"
+                                                   VerticalAlignment="Center" Margin="0,1,7,0" />
+                                        <TextBlock Text="资源包混搭" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource HeroButton}" Margin="10,0,0,0"
+                                        Command="{Binding OpenInstallCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE896;" FontFamily="{StaticResource IconFont}" FontSize="14"
+                                                   VerticalAlignment="Center" Margin="0,1,7,0" />
+                                        <TextBlock Text="一键安装" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                        <Border Grid.Column="1" Width="64" Height="64" CornerRadius="14"
+                                Background="{DynamicResource OverlayHoverBrush}" Padding="6" Margin="18,0,4,0">
+                            <Image Source="pack://application:,,,/Resources/logo.png" Stretch="Uniform" />
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- ===== 公告卡（配置公告源且有内容时显示） ===== -->
+            <Border Background="{DynamicResource PrimarySoftBrush}" CornerRadius="14" Padding="18,13"
+                    Margin="0,0,0,14" Visibility="{Binding AnnounceVisibility}">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                        <TextBlock Text="&#xE900;" FontFamily="{StaticResource IconFont}" FontSize="14"
+                                   Foreground="{DynamicResource PrimaryBrush}"
+                                   VerticalAlignment="Center" Margin="0,0,7,0" />
+                        <TextBlock Text="{Binding AnnounceTitle}" FontWeight="SemiBold" FontSize="13.5"
+                                   Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding AnnounceDate}" FontSize="11.5"
+                                   Foreground="{DynamicResource SubTextBrush}"
+                                   Margin="10,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding AnnounceContent}" TextWrapping="Wrap" LineHeight="19"
+                               FontSize="12.5" Foreground="{DynamicResource SubTextBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- ===== 功能入口卡片 ===== -->
+            <UniformGrid Columns="3" Rows="2" Margin="0,0,0,4">
+                <Button Style="{StaticResource TileButton}" Margin="0,0,10,10"
+                        Command="{Binding NavCommand}" CommandParameter="生成">
+                    <StackPanel>
+                        <Border Width="38" Height="38" CornerRadius="10"
+                                Background="{DynamicResource PrimarySoftBrush}" Margin="0,0,0,10">
+                            <TextBlock Text="&#xE710;" FontFamily="{StaticResource IconFont}"
+                                       FontSize="18" Foreground="{DynamicResource PrimaryBrush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <TextBlock Text="生成" FontSize="15" FontWeight="SemiBold" />
+                        <TextBlock Text="把材质目录打包为 zip，或解包现有 zip 编辑"
+                                   Style="{StaticResource HintText}" Margin="0,3,0,0" />
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource TileButton}" Margin="5,0,5,10"
+                        Command="{Binding NavCommand}" CommandParameter="资源包">
+                    <StackPanel>
+                        <Border Width="38" Height="38" CornerRadius="10"
+                                Background="{DynamicResource PrimarySoftBrush}" Margin="0,0,0,10">
+                            <TextBlock Text="&#xE8B7;" FontFamily="{StaticResource IconFont}"
+                                       FontSize="18" Foreground="{DynamicResource PrimaryBrush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <TextBlock Text="资源包" FontSize="15" FontWeight="SemiBold" />
+                        <TextBlock Text="多包混搭：贴图取 A 包、音效取 B 包，聚合导出"
+                                   Style="{StaticResource HintText}" Margin="0,3,0,0" />
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource TileButton}" Margin="10,0,0,10"
+                        Command="{Binding NavCommand}" CommandParameter="分析">
+                    <StackPanel>
+                        <Border Width="38" Height="38" CornerRadius="10"
+                                Background="{DynamicResource PrimarySoftBrush}" Margin="0,0,0,10">
+                            <TextBlock Text="&#xE9D9;" FontFamily="{StaticResource IconFont}"
+                                       FontSize="18" Foreground="{DynamicResource PrimaryBrush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <TextBlock Text="分析" FontSize="15" FontWeight="SemiBold" />
+                        <TextBlock Text="解析资源包结构、分类占用统计与诊断"
+                                   Style="{StaticResource HintText}" Margin="0,3,0,0" />
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource TileButton}" Margin="0,0,10,0"
+                        Command="{Binding NavCommand}" CommandParameter="安装">
+                    <StackPanel>
+                        <Border Width="38" Height="38" CornerRadius="10"
+                                Background="{DynamicResource PrimarySoftBrush}" Margin="0,0,0,10">
+                            <TextBlock Text="&#xE896;" FontFamily="{StaticResource IconFont}"
+                                       FontSize="18" Foreground="{DynamicResource PrimaryBrush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <TextBlock Text="安装" FontSize="15" FontWeight="SemiBold" />
+                        <TextBlock Text="Java 版 / 网易基岩版一键部署与启用"
+                                   Style="{StaticResource HintText}" Margin="0,3,0,0" />
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource TileButton}" Margin="5,0,5,0"
+                        Command="{Binding NavCommand}" CommandParameter="设置">
+                    <StackPanel>
+                        <Border Width="38" Height="38" CornerRadius="10"
+                                Background="{DynamicResource PrimarySoftBrush}" Margin="0,0,0,10">
+                            <TextBlock Text="&#xE713;" FontFamily="{StaticResource IconFont}"
+                                       FontSize="18" Foreground="{DynamicResource PrimaryBrush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <TextBlock Text="设置" FontSize="15" FontWeight="SemiBold" />
+                        <TextBlock Text="主题色、扫描范围、输出目录等个性化配置"
+                                   Style="{StaticResource HintText}" Margin="0,3,0,0" />
+                    </StackPanel>
+                </Button>
+
+                <!-- 提示卡（不可点占位，保持网格齐整） -->
+                <Border Style="{StaticResource Card}" Margin="10,0,0,0" Padding="18,16">
+                    <StackPanel VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="&#xE946;" FontFamily="{StaticResource IconFont}"
+                                       FontSize="15" Foreground="{DynamicResource PrimaryBrush}"
+                                       VerticalAlignment="Center" Margin="0,0,7,0" />
+                            <TextBlock Text="小贴士" Style="{StaticResource SectionTitle}" />
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource HintText}"
+                                   Text="zip 和文件夹可以直接拖进各页面：资源包页拖入即入库，分析页拖入即分析，安装页拖入即部署。基岩/网易的 .mcpack 压缩档同样全站支持。" />
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
