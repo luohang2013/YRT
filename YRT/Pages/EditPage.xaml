@@ -94,24 +94,75 @@
                                          Width="170" Padding="6,3" FontSize="12" />
                             </StackPanel>
                         </Grid>
+                        <!-- 分类筛选条 -->
+                        <ListBox ItemsSource="{Binding Categories}" SelectedIndex="{Binding SelectedCategory}"
+                                 HorizontalAlignment="Left" Margin="0,8,0,0"
+                                 Background="Transparent" BorderThickness="0" Padding="0"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Foreground" Value="{DynamicResource SubTextBrush}" />
+                                    <Setter Property="FontSize" Value="12.5" />
+                                    <Setter Property="Cursor" Value="Hand" />
+                                    <Setter Property="Margin" Value="0,0,6,0" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border x:Name="bd" CornerRadius="7" Padding="10,4"
+                                                        Background="{DynamicResource TrackBrush}">
+                                                    <ContentPresenter VerticalAlignment="Center" />
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="bd" Property="Background"
+                                                                Value="{DynamicResource HoverBrush}" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter TargetName="bd" Property="Background"
+                                                                Value="{DynamicResource PrimaryBrush}" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource OnPrimaryBrush}" />
+                                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
                         <ListBox ItemsSource="{Binding Items}" SelectedItem="{Binding Selected}"
-                                 Height="300" Margin="0,8,0,0">
+                                 Height="240" Margin="0,8,0,0">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="1,0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="{Binding RelPath}"
                                                    TextTrimming="CharacterEllipsis"
                                                    ToolTip="{Binding RelPath}" />
-                                        <TextBlock Grid.Column="1" Text="{Binding SizeText}"
+                                        <TextBlock Grid.Column="1" Text="{Binding Category}"
+                                                   Style="{StaticResource HintText}" Margin="10,0,0,0" />
+                                        <TextBlock Grid.Column="2" Text="{Binding SizeText}"
                                                    Style="{StaticResource HintText}" Margin="10,0,0,0" />
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
+                        <!-- 图片预览 -->
+                        <Border Height="170" Margin="0,8,0,0" CornerRadius="10"
+                                Background="{DynamicResource TrackBrush}"
+                                Visibility="{Binding HasPreview, Converter={StaticResource BoolToVis}}">
+                            <Image Source="{Binding PreviewImage}" Stretch="Uniform" Margin="10"
+                                   RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                        </Border>
                         <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                             <Button Content="重命名" Padding="14,5" Command="{Binding RenameCommand}" />
                             <Button Content="删除" Padding="14,5" Margin="8,0,0,0"
@@ -120,6 +171,8 @@
                                     Command="{Binding ReplaceCommand}" />
                             <Button Content="添加文件" Padding="14,5" Margin="8,0,0,0"
                                     Command="{Binding AddFileCommand}" />
+                            <Button Content="打开文件" Padding="14,5" Margin="8,0,0,0"
+                                    Command="{Binding OpenFileCommand}" />
                             <Button Style="{StaticResource PrimaryButton}" Content="导出 zip" Padding="16,5"
                                     Margin="8,0,0,0" Command="{Binding ExportCommand}" />
                         </StackPanel>

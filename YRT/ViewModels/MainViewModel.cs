@@ -56,8 +56,7 @@ public class MainViewModel : ObservableObject
                 }
             }));
         }
-        if (!string.IsNullOrWhiteSpace(s.AnnouncementUrl))
-            tasks.Add(Core.UpdateService.LoadAnnouncementAsync(s.AnnouncementUrl));
+        tasks.Add(Core.UpdateService.LoadAnnouncementAsync());
         await Task.WhenAll(tasks);
     }
 

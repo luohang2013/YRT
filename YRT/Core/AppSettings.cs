@@ -67,11 +67,7 @@ public sealed class AppSettings
     // ---------------- 更新与公告 ----------------
 
     // 更新源已内置为 Core.UpdateService.OfficialRepo（不可配置，防篡改注入）
-
-    /// <summary>公告源：文本或 JSON 的 URL（GitHub Raw / Gist / 自建均可）；空 = 不拉取公告。
-    /// 默认内置官方 Gist（不可随意更改，改动仅影响公告显示，不涉及安全）</summary>
-    public string AnnouncementUrl { get; set; } =
-        "https://gist.githubusercontent.com/luohang2013/7df6ed6ad92a4dce210bb77bc1621af1/raw/notice.json";
+    // 公告源已内置为 Core.UpdateService.OfficialAnnouncementUrl（不公示、不可配置，防仿冒篡改）
 
     /// <summary>启动时自动检查更新（默认开；未配置更新源时无操作）</summary>
     public bool CheckUpdateOnStartup { get; set; } = true;
@@ -149,7 +145,6 @@ public sealed class AppSettings
         CustomThemeColor = d.CustomThemeColor;
         ThemeMode = d.ThemeMode;
         AppName = d.AppName;
-        AnnouncementUrl = d.AnnouncementUrl;
         CheckUpdateOnStartup = d.CheckUpdateOnStartup;
         LanzouUrl = d.LanzouUrl;
         LanzouPassword = d.LanzouPassword;

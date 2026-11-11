@@ -272,12 +272,7 @@ public class SettingsViewModel : ObservableObject
 
     // 更新源内置为 Core.UpdateService.OfficialRepo，不提供配置（防篡改注入）
 
-    /// <summary>公告源：文本 / JSON 的 URL</summary>
-    public string AnnouncementUrl
-    {
-        get => AppSettings.Instance.AnnouncementUrl;
-        set { AppSettings.Instance.AnnouncementUrl = value; AppSettings.Save(); OnPropertyChanged(); }
-    }
+    // 公告源内置为 Core.UpdateService.OfficialAnnouncementUrl，不公示、不可配置（防仿冒篡改）
 
     /// <summary>启动时自动检查更新</summary>
     public bool CheckUpdateOnStartup
@@ -349,7 +344,7 @@ public class SettingsViewModel : ObservableObject
         AnnounceStatus = "正在获取公告…";
         try
         {
-            await Core.UpdateService.LoadAnnouncementAsync(AppSettings.Instance.AnnouncementUrl);
+            await Core.UpdateService.LoadAnnouncementAsync();
         }
         finally
         {
@@ -420,10 +415,8 @@ public class SettingsViewModel : ObservableObject
         OnPropertyChanged(nameof(AnnounceDate));
         OnPropertyChanged(nameof(AnnounceContent));
 
-        if (string.IsNullOrWhiteSpace(AppSettings.Instance.AnnouncementUrl))
-            AnnounceStatus = "未配置公告源。填入公开文本链接（GitHub Raw / Gist / 自建）后可获取公告。";
-        else if (Core.UpdateService.AnnouncementError.Length > 0 && _announcement == null)
-            AnnounceStatus = Core.UpdateService.AnnouncementError + "。";
+        if (Core.UpdateService.AnnouncementError.Length > 0 && ReferenceEquals(_announcement, Core.UpdateService.FallbackAnnouncement))
+            AnnounceStatus = Core.UpdateService.AnnouncementError + "，已显示内置公告。";
         else if (_announcement == null)
             AnnounceStatus = "尚未获取公告。";
         else
@@ -446,7 +439,7 @@ public class SettingsViewModel : ObservableObject
                      nameof(PackNameTemplate), nameof(AutoMcmeta), nameof(ScanProgramDir),
                      nameof(ScanAllDrives), nameof(ScanDepth), nameof(Theme), nameof(CustomThemeColor),
                      nameof(IsLightMode), nameof(IsDarkMode), nameof(AppName), nameof(AppNameDisplay),
-                     nameof(AnnouncementUrl), nameof(CheckUpdateOnStartup),
+                     nameof(CheckUpdateOnStartup),
                      nameof(CurrentVersion), nameof(HasLanzou),
                  })
             OnPropertyChanged(p);

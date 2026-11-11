@@ -67,6 +67,22 @@ public static class UpdateService
     /// </summary>
     public const string OfficialRepo = "luohang2013/YRT";
 
+    /// <summary>
+    /// 内置公告源（写死在程序内，不在界面公示、不可配置）：
+    /// URL 一旦公开易被恶意指向仿冒内容；需要改公告时改代码发版即可。
+    /// </summary>
+    public const string OfficialAnnouncementUrl =
+        "https://gist.githubusercontent.com/luohang2013/7df6ed6ad92a4dce210bb77bc1621af1/raw/notice.json";
+
+    /// <summary>离线 / 拉取失败时的兜底公告（保证主页公告卡始终有内容）。</summary>
+    public static Announcement FallbackAnnouncement { get; } = new()
+    {
+        Title = "欢迎使用 YHCT 的资源包工具箱",
+        Date = "",
+        Content = "公告拉取失败时显示本条内置提示。最新版本与更新日志可在「设置 → 更新」一键检查，" +
+                  "或前往 GitHub Releases 下载。祝玩得开心！",
+    };
+
     static UpdateService()
     {
         // GitHub API 要求携带 User-Agent
@@ -176,37 +192,36 @@ public static class UpdateService
     /// <summary>公告内容变化时触发（可能在后台线程触发，订阅方需切回 UI 线程）。</summary>
     public static event Action? AnnouncementChanged;
 
-    /// <summary>拉取公告：JSON（title/date/content 字段）或纯文本均可。异常均转为 AnnouncementError，不抛出。</summary>
-    public static async Task LoadAnnouncementAsync(string? url)
+    /// <summary>拉取官方公告：JSON（title/date/content 字段）或纯文本均可。
+    /// 任何失败都会回退到内置兜底公告，主页公告卡始终有内容。不抛出。</summary>
+    public static async Task LoadAnnouncementAsync()
     {
         Announcement = null;
         AnnouncementError = "";
-        if (!string.IsNullOrWhiteSpace(url))
+        try
         {
-            try
+            var text = (await Http.GetStringAsync(OfficialAnnouncementUrl)).Trim();
+            if (text.StartsWith("{"))
             {
-                var text = (await Http.GetStringAsync(url.Trim())).Trim();
-                if (text.StartsWith("{"))
+                try
                 {
-                    try
-                    {
-                        Announcement = JsonSerializer.Deserialize<Announcement>(text)
-                                       ?? new Announcement { Content = text };
-                    }
-                    catch
-                    {
-                        Announcement = new Announcement { Content = text };
-                    }
+                    Announcement = JsonSerializer.Deserialize<Announcement>(text)
+                                   ?? new Announcement { Content = text };
                 }
-                else
+                catch
                 {
                     Announcement = new Announcement { Content = text };
                 }
             }
-            catch (Exception ex)
+            else
             {
-                AnnouncementError = FriendlyError(ex);
+                Announcement = new Announcement { Content = text };
             }
+        }
+        catch (Exception ex)
+        {
+            AnnouncementError = FriendlyError(ex);
+            Announcement = FallbackAnnouncement; // 兜底：离线也能看到公告卡
         }
         AnnouncementChanged?.Invoke();
     }

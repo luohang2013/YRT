@@ -12,6 +12,24 @@ public sealed record EditFileInfo(string RelPath, string Name, long Size)
         >= 1 << 10 => $"{Size / 1024.0:0.0} KB",
         _ => $"{Size} B",
     };
+
+    /// <summary>按路径与扩展名归类（编辑页分类筛选用）。</summary>
+    public string Category
+    {
+        get
+        {
+            var p = RelPath.ToLowerInvariant();
+            var ext = Path.GetExtension(p);
+            if (p == "pack.mcmeta" || p == "pack.png" || p == "credits.json") return "信息";
+            if (p.Contains("textures/") || ext is ".png" or ".jpg" or ".jpeg" or ".tga" or ".webp") return "贴图";
+            if (p.Contains("sounds/") || p.Contains("sound/") || ext is ".ogg" or ".wav" or ".mp3" or ".fsb") return "音效";
+            if (p.Contains("models/") || p.Contains("blockstates/") || p.Contains("attachables/")) return "模型";
+            if (p.Contains("animations/") || p.Contains("animation_controllers")) return "动画";
+            if (p.Contains("font/") || ext is ".ttf" or ".otf") return "字体";
+            if (p.Contains("lang/") || ext == ".lang") return "语言";
+            return "其他";
+        }
+    }
 }
 
 /// <summary>

@@ -273,18 +273,11 @@
                     <Border Style="{StaticResource Card}">
                         <StackPanel>
                             <TextBlock Style="{StaticResource SectionTitle}" Text="公告" />
-                            <Grid Margin="0,10,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="公告源 URL：" Style="{StaticResource FieldLabel}" />
-                                <TextBox Grid.Column="1" Text="{Binding AnnouncementUrl, UpdateSourceTrigger=PropertyChanged}"
-                                         Margin="6,0,0,0" />
-                            </Grid>
-                            <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
-                                <Button Content="获取公告" Padding="16,7" Cursor="Hand"
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <Button Content="刷新公告" Padding="16,7" Cursor="Hand"
                                         Command="{Binding GetAnnouncementCommand}" IsEnabled="{Binding AnnounceNotBusy}" />
+                                <TextBlock Text="公告由官方内置源自动获取，无需配置。" Style="{StaticResource HintText}"
+                                           VerticalAlignment="Center" Margin="10,0,0,0" />
                             </StackPanel>
                             <TextBlock Margin="0,10,0,0" Text="{Binding AnnounceStatus}" TextWrapping="Wrap"
                                        Style="{StaticResource HintText}" />
@@ -309,7 +302,7 @@
                             </Border>
 
                             <TextBlock Margin="0,10,0,0" Style="{StaticResource HintText}"
-                                       Text="公告源支持任何公开文本链接：GitHub Raw、Gist、自建服务器均可。纯文本直接作为公告内容；JSON 格式则用 {&quot;title&quot;:&quot;标题&quot;,&quot;date&quot;:&quot;日期&quot;,&quot;content&quot;:&quot;内容&quot;} 结构（content 必填）。配置后启动时会自动获取并显示在主页顶部。" />
+                                       Text="公告内容由官方内置源下发（不公开、不可篡改），启动时自动获取并显示在主页顶部；网络不通时会显示内置提示公告。" />
                         </StackPanel>
                     </Border>
                 </StackPanel>

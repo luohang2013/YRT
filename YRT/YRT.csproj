@@ -10,7 +10,7 @@
     <RootNamespace>YRT</RootNamespace>
     <AssemblyName>YRT</AssemblyName>
     <ApplicationIcon>..\..\assets\yrt.ico</ApplicationIcon>
-    <Version>0.5.0</Version>
+    <Version>0.6.0</Version>
     <!-- 真正的单文件：原生库（wpfgfx/PresentationNative 等）也打进 exe，
          否则只复制 YRT.exe 到其他电脑会因缺 DLL 静默启动失败 -->
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>

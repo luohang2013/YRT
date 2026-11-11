@@ -46,7 +46,11 @@ public class EditViewModel : ObservableObject
     public ObservableCollection<EditFileInfo> Items { get; } = new();
 
     private EditFileInfo? _selected;
-    public EditFileInfo? Selected { get => _selected; set => Set(ref _selected, value); }
+    public EditFileInfo? Selected
+    {
+        get => _selected;
+        set { if (Set(ref _selected, value)) LoadPreview(); }
+    }
 
     private string _filter = "";
     public string Filter
@@ -54,6 +58,30 @@ public class EditViewModel : ObservableObject
         get => _filter;
         set { if (Set(ref _filter, value)) RefreshItems(); }
     }
+
+    /// <summary>文件分类筛选（全部/贴图/音效/模型/动画/字体/语言/信息/其他）。</summary>
+    public string[] Categories { get; } = { "全部", "贴图", "音效", "模型", "动画", "字体", "语言", "信息", "其他" };
+
+    private int _selectedCategory;
+    public int SelectedCategory
+    {
+        get => _selectedCategory;
+        set { if (Set(ref _selectedCategory, value)) RefreshItems(); }
+    }
+
+    /// <summary>选中文件是图片时显示预览（BitmapImage，冻结跨线程安全）。</summary>
+    private System.Windows.Media.Imaging.BitmapImage? _previewImage;
+    public System.Windows.Media.Imaging.BitmapImage? PreviewImage
+    {
+        get => _previewImage;
+        private set
+        {
+            Set(ref _previewImage, value);
+            OnPropertyChanged(nameof(HasPreview));
+        }
+    }
+
+    public bool HasPreview => PreviewImage is not null;
 
     private string _workDir = "";
     private string _packRoot = "";
@@ -90,6 +118,7 @@ public class EditViewModel : ObservableObject
     public RelayCommand AddFileCommand { get; }
     public RelayCommand ExportCommand { get; }
     public RelayCommand OpenDirCommand { get; }
+    public RelayCommand OpenFileCommand { get; }
 
     public EditViewModel()
     {
@@ -104,6 +133,7 @@ public class EditViewModel : ObservableObject
         AddFileCommand = new RelayCommand(_ => DoAddFile(), _ => HasPack);
         ExportCommand = new RelayCommand(_ => DoExport(), _ => HasPack);
         OpenDirCommand = new RelayCommand(_ => OpenWorkDir(), _ => HasPack);
+        OpenFileCommand = new RelayCommand(_ => DoOpenFile(), _ => Selected is not null);
 
         PackEditor.CleanStale();
     }
@@ -195,14 +225,20 @@ public class EditViewModel : ObservableObject
         _workDir = _packRoot = "";
         SourcePath = PackName = Description = FormatText = Stats = "";
         Items.Clear();
+        PreviewImage = null;
         OnPropertyChanged(nameof(HasPack));
     }
 
     private void RefreshItems()
     {
         Items.Clear();
-        if (_packRoot.Length == 0) { OnPropertyChanged(nameof(HasPack)); return; }
+        if (_packRoot.Length == 0) { PreviewImage = null; OnPropertyChanged(nameof(HasPack)); return; }
         IEnumerable<EditFileInfo> files = PackEditor.ListFiles(_packRoot);
+        if (SelectedCategory > 0 && SelectedCategory - 1 < Categories.Length - 1)
+        {
+            var cat = Categories[SelectedCategory];
+            files = files.Where(x => x.Category == cat);
+        }
         if (Filter.Trim().Length > 0)
         {
             var f = Filter.Trim();
@@ -212,6 +248,46 @@ public class EditViewModel : ObservableObject
         foreach (var x in list) Items.Add(x);
         Stats = $"{list.Count} 个文件 · {list.Sum(x => x.Size) / 1024.0 / 1024.0:0.00} MB";
         OnPropertyChanged(nameof(HasPack));
+    }
+
+    /// <summary>选中文件是图片时加载预览（从磁盘解码，冻结后供 UI 使用）。</summary>
+    private void LoadPreview()
+    {
+        PreviewImage = null;
+        var item = _selected;
+        if (item is null || _packRoot.Length == 0) return;
+        var ext = Path.GetExtension(item.RelPath).ToLowerInvariant();
+        if (ext is not ".png" and not ".jpg" and not ".jpeg" and not ".bmp" and not ".gif") return;
+        try
+        {
+            var full = Path.Combine(_packRoot, item.RelPath.Replace('/', Path.DirectorySeparatorChar));
+            if (!File.Exists(full)) return;
+            var bmp = new System.Windows.Media.Imaging.BitmapImage();
+            bmp.BeginInit();
+            bmp.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
+            bmp.UriSource = new Uri(full, UriKind.Absolute);
+            bmp.EndInit();
+            bmp.Freeze();
+            PreviewImage = bmp;
+        }
+        catch
+        {
+            PreviewImage = null; // 图片损坏不阻塞编辑
+        }
+    }
+
+    /// <summary>用系统默认程序打开选中文件（工作副本内）。</summary>
+    private void DoOpenFile()
+    {
+        var item = Selected;
+        if (item is null || _packRoot.Length == 0) return;
+        try
+        {
+            var full = Path.Combine(_packRoot, item.RelPath.Replace('/', Path.DirectorySeparatorChar));
+            if (!File.Exists(full)) { Log("[!] 文件不存在：" + item.RelPath); return; }
+            Process.Start(new ProcessStartInfo(full) { UseShellExecute = true });
+        }
+        catch (Exception ex) { Log("[!] 打开失败：" + ex.Message); }
     }
 
     private void LoadMeta()
