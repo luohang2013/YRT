@@ -52,7 +52,7 @@
 
                 <!-- ===== 外观 ===== -->
                 <StackPanel Visibility="{Binding ShowAppearance, Converter={StaticResource BoolToVis}}">
-                    <Border Style="{StaticResource Card}" Margin="0">
+                    <Border Style="{StaticResource Card}">
                         <StackPanel>
                             <TextBlock Style="{StaticResource SectionTitle}" Text="界面模式" />
                             <Border Style="{StaticResource SegTrack}" Margin="0,10,0,0">
@@ -127,7 +127,7 @@
 
                 <!-- ===== 安装 ===== -->
                 <StackPanel Visibility="{Binding ShowInstall, Converter={StaticResource BoolToVis}}">
-                    <Border Style="{StaticResource Card}" Margin="0">
+                    <Border Style="{StaticResource Card}">
                         <StackPanel>
                             <TextBlock Style="{StaticResource SectionTitle}" Text="安装默认行为" />
                             <CheckBox Content="基岩一键安装前自动结束 Minecraft 进程" Margin="0,10,0,0"
@@ -160,7 +160,7 @@
 
                 <!-- ===== 生成 ===== -->
                 <StackPanel Visibility="{Binding ShowGenerate, Converter={StaticResource BoolToVis}}">
-                    <Border Style="{StaticResource Card}" Margin="0">
+                    <Border Style="{StaticResource Card}">
                         <StackPanel>
                             <TextBlock Style="{StaticResource SectionTitle}" Text="生成页默认值" />
                             <Grid Margin="0,10,0,0">
@@ -194,7 +194,7 @@
 
                 <!-- ===== 扫描 ===== -->
                 <StackPanel Visibility="{Binding ShowScan, Converter={StaticResource BoolToVis}}">
-                    <Border Style="{StaticResource Card}" Margin="0">
+                    <Border Style="{StaticResource Card}">
                         <StackPanel>
                             <TextBlock Style="{StaticResource SectionTitle}" Text="扫描设置" />
                             <TextBlock Margin="0,10,0,0" Style="{StaticResource HintText}"
@@ -221,7 +221,7 @@
 
                 <!-- ===== 更新 ===== -->
                 <StackPanel Visibility="{Binding ShowUpdate, Converter={StaticResource BoolToVis}}">
-                    <Border Style="{StaticResource Card}" Margin="0">
+                    <Border Style="{StaticResource Card}">
                         <StackPanel>
                             <TextBlock Style="{StaticResource SectionTitle}" Text="检查更新" />
                             <TextBlock Margin="0,10,0,0" Style="{StaticResource HintText}"
@@ -309,7 +309,7 @@
 
                 <!-- ===== 关于 ===== -->
                 <StackPanel Visibility="{Binding ShowAbout, Converter={StaticResource BoolToVis}}">
-                    <Border Style="{StaticResource Card}" Margin="0">
+                    <Border Style="{StaticResource Card}">
                         <StackPanel>
                             <TextBlock Style="{StaticResource SectionTitle}" Text="关于" />
                             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">

@@ -16,6 +16,8 @@ public class GenerateViewModel : ObservableObject
     private string _packName = "";
     private string _outDir = DefaultOutDir();
     private string _lastOut = "尚未生成";
+    private string _overrideDescription = "";
+    private string _iconPath = "";
     public ObservableCollection<string> Logs { get; } = new()
     {
         "欢迎使用生成页。把材质目录打包为 Minecraft 可识别的 zip（条目路径强制正斜杠）；也可解包现有 zip 进行编辑。",
@@ -26,6 +28,12 @@ public class GenerateViewModel : ObservableObject
     public string OutDir { get => _outDir; set => Set(ref _outDir, value); }
     public string LastOut { get => _lastOut; private set => Set(ref _lastOut, value); }
 
+    /// <summary>临时简介：仅写入本次生成的 zip 内 pack.mcmeta，不改动源目录。</summary>
+    public string OverrideDescription { get => _overrideDescription; set => Set(ref _overrideDescription, value); }
+
+    /// <summary>临时图标（pack.png）路径：仅写入本次生成的 zip，不改动源目录。</summary>
+    public string IconPath { get => _iconPath; set => Set(ref _iconPath, value); }
+
     /// <summary>打包时目录缺 pack.mcmeta 则在 zip 内自动补齐（写入设置）</summary>
     public bool AutoMcmeta
     {
@@ -35,6 +43,7 @@ public class GenerateViewModel : ObservableObject
 
     public RelayCommand BrowseSrcCommand { get; }
     public RelayCommand BrowseOutCommand { get; }
+    public RelayCommand BrowseIconCommand { get; }
     public RelayCommand PackCommand { get; }
     public RelayCommand UnpackCommand { get; }
     public RelayCommand OpenOutDirCommand { get; }
@@ -44,10 +53,21 @@ public class GenerateViewModel : ObservableObject
     {
         BrowseSrcCommand = new RelayCommand(_ => BrowseSrc());
         BrowseOutCommand = new RelayCommand(_ => BrowseOut());
+        BrowseIconCommand = new RelayCommand(_ => BrowseIcon());
         PackCommand = new RelayCommand(_ => DoPack());
         UnpackCommand = new RelayCommand(_ => DoUnpack());
         OpenOutDirCommand = new RelayCommand(_ => OpenOutDir());
         ClearLogCommand = new RelayCommand(_ => Logs.Clear());
+    }
+
+    private void BrowseIcon()
+    {
+        var dlg = new OpenFileDialog
+        {
+            Title = "选择包图标（建议 128×128 以上的 png）",
+            Filter = "图片 (*.png;*.jpg;*.jpeg;*.bmp)|*.png;*.jpg;*.jpeg;*.bmp|所有文件|*.*",
+        };
+        if (dlg.ShowDialog() == true) IconPath = dlg.FileName;
     }
 
     private static string DefaultOutDir()
@@ -99,15 +119,43 @@ public class GenerateViewModel : ObservableObject
         var name = string.IsNullOrWhiteSpace(PackName)
             ? ApplyNameTemplate(Path.GetFileName(SrcDir.TrimEnd(Path.DirectorySeparatorChar)) ?? "")
             : PackName.Trim();
+
+        // 生成前确认：再次展示 名称 / 简介 / 图标，可临时修改（只影响本次 zip）
+        var confirm = new YRT.Views.ConfirmPackWindow(name, OverrideDescription, IconPath)
+        {
+            Owner = System.Windows.Application.Current?.MainWindow,
+        };
+        if (confirm.ShowDialog() != true)
+        {
+            Log("[i] 已取消打包");
+            return;
+        }
+        name = string.IsNullOrWhiteSpace(confirm.PackName) ? name : confirm.PackName.Trim();
+        var desc = confirm.Description?.Trim() ?? "";
+        var icon = confirm.IconPath?.Trim() ?? "";
+        if (icon.Length > 0 && !File.Exists(icon))
+        {
+            Log("[!] 图标文件不存在: " + icon);
+            return;
+        }
+
         var outZip = Path.Combine(OutDir.Trim(), name + ".zip");
         try
         {
             var auto = AppSettings.Instance.AutoMcmeta;
-            var n = PackPacker.PackDir(SrcDir, outZip, autoMcmeta: auto, packName: name);
+            var n = PackPacker.PackDir(SrcDir, outZip, autoMcmeta: auto, packName: name,
+                description: desc.Length > 0 ? desc : null,
+                iconPath: icon.Length > 0 ? icon : null);
+            OverrideDescription = desc;
+            IconPath = icon;
             LastOut = outZip;
+            var notes = new List<string>();
             var note = auto && !File.Exists(Path.Combine(SrcDir, "pack.mcmeta"))
                 ? "，已自动补齐 pack.mcmeta（可在设置里关闭）" : "";
-            Log($"[√] 打包完成: {outZip}（{n} 个文件, {DirSizeMb(SrcDir):F1} MB{note}）");
+            if (note.Length > 0) notes.Add(note.TrimStart('，'));
+            if (desc.Length > 0) notes.Add("已写入临时简介");
+            if (icon.Length > 0) notes.Add("已写入临时图标");
+            Log($"[√] 打包完成: {outZip}（{n} 个文件, {DirSizeMb(SrcDir):F1} MB{string.Join("；", notes)}）");
         }
         catch (Exception ex)
         {

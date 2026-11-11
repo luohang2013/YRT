@@ -60,6 +60,34 @@
                                     Command="{Binding BrowseOutCommand}" />
                         </Grid>
 
+                        <!-- 简介临时修改 -->
+                        <Grid Margin="0,10,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="包简介：" Style="{StaticResource FieldLabel}" />
+                            <TextBox Grid.Column="1" Text="{Binding OverrideDescription, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="6,0" Height="46" TextWrapping="Wrap"
+                                     VerticalContentAlignment="Top"
+                                     ToolTip="仅写入本次生成的 zip 内 pack.mcmeta，不改动源目录" />
+                        </Grid>
+
+                        <!-- 图标临时修改 -->
+                        <Grid Margin="0,10,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="包图标：" Style="{StaticResource FieldLabel}" />
+                            <TextBox Grid.Column="1" Text="{Binding IconPath, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="6,0" FontSize="11.5"
+                                     ToolTip="仅写入本次生成的 zip 内 pack.png，不改动源目录；留空沿用源目录自带图标" />
+                            <Button Grid.Column="2" Content="浏览" Padding="14,6"
+                                    Command="{Binding BrowseIconCommand}" />
+                        </Grid>
+
                         <!-- 主操作 -->
                         <CheckBox Content="目录缺 pack.mcmeta 时自动补齐（不改源目录，仅写入 zip）"
                                   IsChecked="{Binding AutoMcmeta}" Margin="0,14,0,0" />
@@ -70,6 +98,8 @@
                             <Button Content="打开输出目录" Margin="12,0,0,0" Padding="16,8"
                                     Command="{Binding OpenOutDirCommand}" />
                         </StackPanel>
+                        <TextBlock Margin="0,10,0,0" Style="{StaticResource HintText}"
+                                   Text="点「打包为 zip」后会弹出确认窗口，再次核对并允许临时修改名称 / 简介 / 图标。" />
                         <TextBlock Margin="0,10,0,0" Style="{StaticResource HintText}"
                                    Text="{Binding LastOut, StringFormat=上次输出：{0}}"
                                    TextTrimming="CharacterEllipsis" />

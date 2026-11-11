@@ -26,7 +26,7 @@
 
             <!-- ============ 左列：导入来源 ============ -->
             <StackPanel Grid.Column="0">
-                <Border Style="{StaticResource Card}" Margin="0">
+                <Border Style="{StaticResource Card}">
                     <StackPanel>
                         <Grid>
                             <TextBlock Text="游戏里的资源包" Style="{StaticResource SectionTitle}" />
@@ -57,7 +57,7 @@
                     </StackPanel>
                 </Border>
 
-                <Border Style="{StaticResource Card}" Margin="0">
+                <Border Style="{StaticResource Card}">
                     <StackPanel>
                         <TextBlock Text="包详情" Style="{StaticResource SectionTitle}" />
                         <TextBlock Text="{Binding PackName, StringFormat=包名：{0}}"
@@ -83,7 +83,7 @@
 
             <!-- ============ 右列：文件编辑 ============ -->
             <StackPanel Grid.Column="2">
-                <Border Style="{StaticResource Card}" Margin="0">
+                <Border Style="{StaticResource Card}">
                     <StackPanel>
                         <Grid>
                             <TextBlock Text="包内文件" Style="{StaticResource SectionTitle}" />
@@ -181,7 +181,7 @@
                     </StackPanel>
                 </Border>
 
-                <Border Style="{StaticResource Card}" Margin="0">
+                <Border Style="{StaticResource Card}">
                     <StackPanel>
                         <Grid>
                             <TextBlock Text="控制台" Style="{StaticResource SectionTitle}" />
