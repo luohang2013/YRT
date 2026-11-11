@@ -60,6 +60,12 @@ public static class UpdateService
 {
     private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(15) };
 
+    /// <summary>
+    /// 内置官方更新源（写死在程序内，不提供配置项）：
+    /// 防止更新源被篡改后指向恶意仓库，导致更新提示 / 下载页被注入。
+    /// </summary>
+    public const string OfficialRepo = "luohang2013/YRT";
+
     static UpdateService()
     {
         // GitHub API 要求携带 User-Agent

@@ -54,8 +54,7 @@ public sealed class AppSettings
 
     // ---------------- 更新与公告 ----------------
 
-    /// <summary>更新源：GitHub 仓库（owner/repo）；空 = 不检查更新</summary>
-    public string UpdateRepo { get; set; } = "";
+    // 更新源已内置为 Core.UpdateService.OfficialRepo（不可配置，防篡改注入）
 
     /// <summary>公告源：文本或 JSON 的 URL（GitHub Raw / Gist / 自建均可）；空 = 不拉取公告</summary>
     public string AnnouncementUrl { get; set; } = "";
@@ -132,7 +131,6 @@ public sealed class AppSettings
         CustomThemeColor = d.CustomThemeColor;
         ThemeMode = d.ThemeMode;
         AppName = d.AppName;
-        UpdateRepo = d.UpdateRepo;
         AnnouncementUrl = d.AnnouncementUrl;
         CheckUpdateOnStartup = d.CheckUpdateOnStartup;
         LanzouUrl = d.LanzouUrl;

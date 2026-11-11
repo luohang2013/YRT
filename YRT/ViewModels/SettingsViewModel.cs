@@ -225,12 +225,7 @@ public class SettingsViewModel : ObservableObject
 
     // ---------------- 更新与公告 ----------------
 
-    /// <summary>更新源：GitHub 仓库（owner/repo）</summary>
-    public string UpdateRepo
-    {
-        get => AppSettings.Instance.UpdateRepo;
-        set { AppSettings.Instance.UpdateRepo = value; AppSettings.Save(); OnPropertyChanged(); }
-    }
+    // 更新源内置为 Core.UpdateService.OfficialRepo，不提供配置（防篡改注入）
 
     /// <summary>公告源：文本 / JSON 的 URL</summary>
     public string AnnouncementUrl
@@ -293,7 +288,7 @@ public class SettingsViewModel : ObservableObject
         UpdateStatus = "正在检查更新…";
         try
         {
-            await Core.UpdateService.CheckForUpdateAsync(AppSettings.Instance.UpdateRepo);
+            await Core.UpdateService.CheckForUpdateAsync(Core.UpdateService.OfficialRepo);
         }
         finally
         {
@@ -320,10 +315,9 @@ public class SettingsViewModel : ObservableObject
 
     private void OpenReleasePage()
     {
-        var repo = AppSettings.Instance.UpdateRepo.Trim();
         var url = Core.UpdateService.LatestRelease?.HtmlUrl;
         if (string.IsNullOrWhiteSpace(url))
-            url = string.IsNullOrWhiteSpace(repo) ? "" : $"https://github.com/{repo.TrimEnd('/')}/releases";
+            url = $"https://github.com/{Core.UpdateService.OfficialRepo}/releases";
         if (!url.StartsWith("http", StringComparison.OrdinalIgnoreCase)) return;
         try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true }); }
         catch { /* 打开失败忽略 */ }
@@ -363,9 +357,7 @@ public class SettingsViewModel : ObservableObject
         OnPropertyChanged(nameof(ReleaseNotes));
         OnPropertyChanged(nameof(ReleaseUrl));
 
-        if (string.IsNullOrWhiteSpace(AppSettings.Instance.UpdateRepo))
-            UpdateStatus = "未配置更新源。填入 GitHub 仓库（owner/repo）并发布 Release 后，这里即可检测新版本。";
-        else if (Core.UpdateService.LastError.Length > 0 && _release == null)
+        if (Core.UpdateService.LastError.Length > 0 && _release == null)
             UpdateStatus = Core.UpdateService.LastError + "。";
         else if (_release == null)
             UpdateStatus = "尚未检查更新。";
@@ -408,7 +400,7 @@ public class SettingsViewModel : ObservableObject
                      nameof(PackNameTemplate), nameof(AutoMcmeta), nameof(ScanProgramDir),
                      nameof(ScanAllDrives), nameof(ScanDepth), nameof(Theme), nameof(CustomThemeColor),
                      nameof(IsLightMode), nameof(IsDarkMode), nameof(AppName), nameof(AppNameDisplay),
-                     nameof(UpdateRepo), nameof(AnnouncementUrl), nameof(CheckUpdateOnStartup),
+                     nameof(AnnouncementUrl), nameof(CheckUpdateOnStartup),
                      nameof(CurrentVersion), nameof(HasLanzou),
                  })
             OnPropertyChanged(p);

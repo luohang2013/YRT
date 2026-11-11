@@ -37,8 +37,8 @@ public class MainViewModel : ObservableObject
     private static async Task RunStartupChecksAsync()
     {
         var s = Core.AppSettings.Instance;
-        if (s.CheckUpdateOnStartup && !string.IsNullOrWhiteSpace(s.UpdateRepo))
-            await Core.UpdateService.CheckForUpdateAsync(s.UpdateRepo);
+        if (s.CheckUpdateOnStartup)
+            await Core.UpdateService.CheckForUpdateAsync(Core.UpdateService.OfficialRepo);
         if (!string.IsNullOrWhiteSpace(s.AnnouncementUrl))
             await Core.UpdateService.LoadAnnouncementAsync(s.AnnouncementUrl);
     }
