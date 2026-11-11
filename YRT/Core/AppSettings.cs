@@ -63,6 +63,12 @@ public sealed class AppSettings
     /// <summary>启动时自动检查更新（默认开；未配置更新源时无操作）</summary>
     public bool CheckUpdateOnStartup { get; set; } = true;
 
+    /// <summary>蓝奏云下载页（文件夹外链或文件链接）；空 = 界面隐藏蓝奏云入口</summary>
+    public string LanzouUrl { get; set; } = "https://wwbrw.lanzouq.com/b00ybjxczg";
+
+    /// <summary>蓝奏云提取码（点击下载按钮时自动复制到剪贴板）；空 = 无密码</summary>
+    public string LanzouPassword { get; set; } = "YRT";
+
     // ---------------- 资源包库 ----------------
 
     /// <summary>资源包页来源包库（启动时自动恢复；移除/清空后同步保存）</summary>
@@ -129,5 +135,7 @@ public sealed class AppSettings
         UpdateRepo = d.UpdateRepo;
         AnnouncementUrl = d.AnnouncementUrl;
         CheckUpdateOnStartup = d.CheckUpdateOnStartup;
+        LanzouUrl = d.LanzouUrl;
+        LanzouPassword = d.LanzouPassword;
     }
 }

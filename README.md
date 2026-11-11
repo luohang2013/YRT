@@ -20,7 +20,7 @@
 ## 下载
 
 - **GitHub Releases**（推荐）：https://github.com/luohang2013/YRT/releases
-- **蓝奏云备用**：（上传后把链接贴在这里）
+- **蓝奏云备用**：https://wwbrw.lanzouq.com/b00ybjxczg （提取码 `YRT`）
 
 软件内也会自动提示新版本：设置 → 更新 → 检查更新。
 

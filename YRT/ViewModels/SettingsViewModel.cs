@@ -21,6 +21,7 @@ public class SettingsViewModel : ObservableObject
     public RelayCommand CheckUpdateCommand { get; }
     public RelayCommand GetAnnouncementCommand { get; }
     public RelayCommand OpenReleaseCommand { get; }
+    public RelayCommand OpenLanzouCommand { get; }
     public RelayCommand ResetCommand { get; }
 
     // ---------------- 分类导航（图八：设置分类排放） ----------------
@@ -65,6 +66,7 @@ public class SettingsViewModel : ObservableObject
         CheckUpdateCommand = new RelayCommand(_ => _ = CheckUpdateAsync());
         GetAnnouncementCommand = new RelayCommand(_ => _ = GetAnnouncementAsync());
         OpenReleaseCommand = new RelayCommand(_ => OpenReleasePage());
+        OpenLanzouCommand = new RelayCommand(_ => OpenLanzou());
         ResetCommand = new RelayCommand(_ => DoReset());
 
         // 订阅更新/公告结果（可能在后台线程触发，切回 UI 线程刷新）
@@ -327,6 +329,29 @@ public class SettingsViewModel : ObservableObject
         catch { /* 打开失败忽略 */ }
     }
 
+    /// <summary>蓝奏云入口是否可用（未配置链接时隐藏按钮）</summary>
+    public bool HasLanzou => !string.IsNullOrWhiteSpace(AppSettings.Instance.LanzouUrl);
+
+    private void OpenLanzou()
+    {
+        var url = AppSettings.Instance.LanzouUrl.Trim();
+        if (!url.StartsWith("http", StringComparison.OrdinalIgnoreCase)) return;
+        var pwd = AppSettings.Instance.LanzouPassword?.Trim() ?? "";
+        try
+        {
+            if (pwd.Length > 0)
+                System.Windows.Clipboard.SetText(pwd);
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
+            UpdateStatus = pwd.Length > 0
+                ? $"已在浏览器打开蓝奏云，提取码 {pwd} 已复制到剪贴板。"
+                : "已在浏览器打开蓝奏云。";
+        }
+        catch (Exception ex)
+        {
+            UpdateStatus = $"打开蓝奏云失败：{ex.Message}";
+        }
+    }
+
     private void RefreshUpdateState()
     {
         _release = Core.UpdateService.LatestRelease;
@@ -384,7 +409,7 @@ public class SettingsViewModel : ObservableObject
                      nameof(ScanAllDrives), nameof(ScanDepth), nameof(Theme), nameof(CustomThemeColor),
                      nameof(IsLightMode), nameof(IsDarkMode), nameof(AppName), nameof(AppNameDisplay),
                      nameof(UpdateRepo), nameof(AnnouncementUrl), nameof(CheckUpdateOnStartup),
-                     nameof(CurrentVersion),
+                     nameof(CurrentVersion), nameof(HasLanzou),
                  })
             OnPropertyChanged(p);
         RefreshUpdateState();
