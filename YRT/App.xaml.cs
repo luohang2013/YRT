@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Threading;
 using YRT.FirstRun;
 using YRT.Theme;
+using YRT.Views;
 
 namespace YRT;
 
@@ -48,6 +49,35 @@ public partial class App : Application
             Log($"OnStartup catch: {ex}");
             MessageBox.Show($"首次运行初始化失败：{ex.InnerException?.Message ?? ex.Message}",
                 "YRT", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        // 启动动画：先弹 Splash，主窗口渲染完成后淡出
+        SplashWindow? splash = null;
+        try
+        {
+            splash = new SplashWindow();
+            splash.Show();
+        }
+        catch (Exception ex)
+        {
+            Log($"splash failed (ignored): {ex.Message}");
+        }
+
+        try
+        {
+            var main = new MainWindow();
+            MainWindow = main;
+            if (splash is not null)
+                main.ContentRendered += (_, _) => splash.CloseWithFade();
+            main.Show();
+            Log("main window shown");
+        }
+        catch (Exception ex)
+        {
+            Log($"main window failed: {ex}");
+            splash?.Close();
+            MessageBox.Show(ex.ToString(), "YRT 启动失败", MessageBoxButton.OK, MessageBoxImage.Error);
+            Shutdown(-1);
         }
     }
 

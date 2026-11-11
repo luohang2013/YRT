@@ -1,0 +1,20 @@
+<Window x:Class="YRT.Views.InputWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Width="420" SizeToContent="Height" WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize" ShowInTaskbar="False"
+        Background="{DynamicResource BackgroundBrush}" WindowStyle="ToolWindow">
+    <StackPanel Margin="20,16">
+        <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="Bold"
+                   Foreground="{DynamicResource TextBrush}" />
+        <TextBlock Text="{Binding Message}" Style="{StaticResource HintText}" Margin="0,5,0,0"
+                   TextWrapping="Wrap" />
+        <TextBox Margin="0,12,0,0" Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
+                 x:Name="ValueBox" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,2">
+            <Button Content="取消" Padding="16,7" IsCancel="True" />
+            <Button Content="确定" Style="{StaticResource PrimaryButton}" Padding="16,7"
+                    Margin="10,0,0,0" IsDefault="True" Click="Ok_Click" />
+        </StackPanel>
+    </StackPanel>
+</Window>

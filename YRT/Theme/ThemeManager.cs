@@ -18,12 +18,12 @@ public static class ThemeManager
         ["Amber"] = ("#B07D3A", "#C49350", "#976C31"),
     };
 
-    // 深浅色两套中性色板：背景/卡片/输入框/轨道/文字/次文字/分割线/控制台
-    private static readonly (string Bg, string Card, string Field, string Track, string Text, string SubText, string Divider, string Console, string Hover, string Pressed) LightPalette =
-        ("#F4F4F1", "#FFFFFF", "#F7F7F4", "#ECECE6", "#2B2B28", "#8A8A84", "#E3E3DD", "#FBFBF9", "#12000000", "#1E000000");
+    // 深浅色两套中性色板：背景/卡片/输入框/轨道/文字/次文字/分割线/控制台/悬停/按下/滚动条滑块
+    private static readonly (string Bg, string Card, string Field, string Track, string Text, string SubText, string Divider, string Console, string Hover, string Pressed, string Thumb, string ThumbHover) LightPalette =
+        ("#F4F4F1", "#FFFFFF", "#F7F7F4", "#ECECE6", "#2B2B28", "#8A8A84", "#E3E3DD", "#FBFBF9", "#12000000", "#1E000000", "#28000000", "#48000000");
 
-    private static readonly (string Bg, string Card, string Field, string Track, string Text, string SubText, string Divider, string Console, string Hover, string Pressed) DarkPalette =
-        ("#1F1F23", "#2A2A30", "#232327", "#17171A", "#EAEAE6", "#9A9AA2", "#3A3A42", "#26262B", "#14FFFFFF", "#24FFFFFF");
+    private static readonly (string Bg, string Card, string Field, string Track, string Text, string SubText, string Divider, string Console, string Hover, string Pressed, string Thumb, string ThumbHover) DarkPalette =
+        ("#1F1F23", "#2A2A30", "#232327", "#17171A", "#EAEAE6", "#9A9AA2", "#3A3A42", "#26262B", "#14FFFFFF", "#24FFFFFF", "#30FFFFFF", "#55FFFFFF");
 
     private static bool _isDark;
     private static Color _primary = Color.FromRgb(0x3D, 0x8B, 0x5F);
@@ -69,6 +69,8 @@ public static class ThemeManager
         SetBrush("ConsoleBrush", p.Console);
         SetBrush("HoverBrush", p.Hover);
         SetBrush("PressedBrush", p.Pressed);
+        SetBrush("ThumbBrush", p.Thumb);
+        SetBrush("ThumbHoverBrush", p.ThumbHover);
         // 浅底色跟随模式重新派生（深色下与深色卡片混合）
         DeriveSoftAndContrast();
     }

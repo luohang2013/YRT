@@ -1,3 +1,4 @@
+using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Text.Json;
@@ -216,4 +217,52 @@ public static class UpdateService
         TaskCanceledException => "请求超时，请稍后重试",
         _ => "请求失败：" + ex.Message,
     };
+
+    // ---------------- 自动下载更新 ----------------
+
+    /// <summary>从 Release 附件里挑出安装包：优先 .zip，其次任意附件；没有附件返回 null。</summary>
+    public static GitHubAsset? PickAsset(GitHubRelease release)
+    {
+        if (release.Assets.Count == 0) return null;
+        return release.Assets.FirstOrDefault(a =>
+                   a.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+               ?? release.Assets[0];
+    }
+
+    /// <summary>
+    /// 下载 Release 附件到 destDir（自动创建目录），流式写入并汇报进度（0-100）。
+    /// 返回下载后的本地文件完整路径。
+    /// </summary>
+    public static async Task<string> DownloadReleaseAsync(
+        GitHubAsset asset, string destDir,
+        IProgress<(int Percent, string Text)>? progress, CancellationToken ct = default)
+    {
+        Directory.CreateDirectory(destDir);
+        var target = Path.Combine(destDir, asset.Name);
+
+        using var resp = await Http.GetAsync(
+            asset.BrowserDownloadUrl, HttpCompletionOption.ResponseHeadersRead, ct);
+        resp.EnsureSuccessStatusCode();
+
+        var total = resp.Content.Headers.ContentLength ?? asset.Size;
+        await using var src = await resp.Content.ReadAsStreamAsync(ct);
+        await using var dst = File.Create(target);
+
+        var buffer = new byte[81920];
+        long written = 0;
+        var lastReport = 0;
+        int read;
+        while ((read = await src.ReadAsync(buffer, ct)) > 0)
+        {
+            await dst.WriteAsync(buffer.AsMemory(0, read), ct);
+            written += read;
+            if (progress is null || total <= 0) continue;
+            var pct = (int)(written * 100 / total);
+            if (pct == lastReport) continue;
+            lastReport = pct;
+            progress.Report((pct, $"正在下载 {asset.Name}… {pct}%（{written / 1024 / 1024} / {total / 1024 / 1024} MB）"));
+        }
+        progress?.Report((100, $"下载完成：{target}"));
+        return target;
+    }
 }

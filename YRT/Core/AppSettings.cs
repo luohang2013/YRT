@@ -19,6 +19,18 @@ public sealed class AppSettings
     /// <summary>安装完成后自动打开目标目录</summary>
     public bool OpenDirAfterInstall { get; set; } = false;
 
+    /// <summary>Java 部署重名策略：Overwrite = 覆盖同名 zip；Rename = 自动加序号</summary>
+    public string DeployConflict { get; set; } = "Overwrite";
+
+    /// <summary>基岩安装前把目标槽位备份为 zip（存于数据目录 backup\，默认开）</summary>
+    public bool BackupBeforeInstall { get; set; } = true;
+
+    /// <summary>安装完成后弹出提示框（默认开）</summary>
+    public bool NotifyAfterInstall { get; set; } = true;
+
+    /// <summary>部署前自动结束 MC 进程之外，再检查文件占用（默认关）</summary>
+    public bool CheckFileLock { get; set; } = false;
+
     // ---------------- 生成页默认值 ----------------
 
     /// <summary>默认输出目录（空 = exe 同级 output\）</summary>
@@ -56,8 +68,10 @@ public sealed class AppSettings
 
     // 更新源已内置为 Core.UpdateService.OfficialRepo（不可配置，防篡改注入）
 
-    /// <summary>公告源：文本或 JSON 的 URL（GitHub Raw / Gist / 自建均可）；空 = 不拉取公告</summary>
-    public string AnnouncementUrl { get; set; } = "";
+    /// <summary>公告源：文本或 JSON 的 URL（GitHub Raw / Gist / 自建均可）；空 = 不拉取公告。
+    /// 默认内置官方 Gist（不可随意更改，改动仅影响公告显示，不涉及安全）</summary>
+    public string AnnouncementUrl { get; set; } =
+        "https://gist.githubusercontent.com/luohang2013/7df6ed6ad92a4dce210bb77bc1621af1/raw/notice.json";
 
     /// <summary>启动时自动检查更新（默认开；未配置更新源时无操作）</summary>
     public bool CheckUpdateOnStartup { get; set; } = true;
@@ -122,6 +136,10 @@ public sealed class AppSettings
         var d = new AppSettings();
         KillMc = d.KillMc;
         OpenDirAfterInstall = d.OpenDirAfterInstall;
+        DeployConflict = d.DeployConflict;
+        BackupBeforeInstall = d.BackupBeforeInstall;
+        NotifyAfterInstall = d.NotifyAfterInstall;
+        CheckFileLock = d.CheckFileLock;
         DefaultOutDir = d.DefaultOutDir;
         PackNameTemplate = d.PackNameTemplate;
         AutoMcmeta = d.AutoMcmeta;

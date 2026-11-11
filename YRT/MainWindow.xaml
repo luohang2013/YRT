@@ -30,7 +30,7 @@
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <Border Width="36" Height="36" CornerRadius="9"
                             BorderBrush="{DynamicResource DividerBrush}" BorderThickness="1"
-                            Background="White">
+                            Background="{DynamicResource CardBrush}">
                         <Image Source="Resources/logo.png" Stretch="Uniform" Margin="2" />
                     </Border>
                     <StackPanel VerticalAlignment="Center" Margin="10,0,22,0">

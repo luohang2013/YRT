@@ -10,7 +10,14 @@
     <RootNamespace>YRT</RootNamespace>
     <AssemblyName>YRT</AssemblyName>
     <ApplicationIcon>..\..\assets\yrt.ico</ApplicationIcon>
-    <Version>0.4.0</Version>
+    <Version>0.5.0</Version>
+    <!-- 真正的单文件：原生库（wpfgfx/PresentationNative 等）也打进 exe，
+         否则只复制 YRT.exe 到其他电脑会因缺 DLL 静默启动失败 -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
     <Product>YHCT 的资源包工具箱 (YiHangCT)</Product>
     <Description>资源包生成 / 混搭 / 分析 / 安装工具箱（YiHangCT 出品）</Description>
   </PropertyGroup>

@@ -196,10 +196,10 @@
                                 <Thumb>
                                     <Thumb.Template>
                                         <ControlTemplate TargetType="Thumb">
-                                            <Border x:Name="thumb" Background="#28000000" CornerRadius="5" Margin="2" />
+                                            <Border x:Name="thumb" Background="{DynamicResource ThumbBrush}" CornerRadius="5" Margin="2" />
                                             <ControlTemplate.Triggers>
                                                 <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter TargetName="thumb" Property="Background" Value="#48000000" />
+                                                    <Setter TargetName="thumb" Property="Background" Value="{DynamicResource ThumbHoverBrush}" />
                                                 </Trigger>
                                             </ControlTemplate.Triggers>
                                         </ControlTemplate>
@@ -253,7 +253,7 @@
                         </Trigger>
                         <Trigger Property="Tag" Value="Selected">
                             <Setter TargetName="bd" Property="Background" Value="{DynamicResource PrimaryBrush}" />
-                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="Foreground" Value="{DynamicResource OnPrimaryBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

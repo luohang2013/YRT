@@ -32,6 +32,9 @@
     <!-- 中性交互反馈（深浅色模式下分别取黑/白叠加） -->
     <Color x:Key="HoverColor">#12000000</Color>
     <Color x:Key="PressedColor">#1E000000</Color>
+    <!-- 滚动条滑块（深色模式翻转为白色叠加，避免黑条隐身） -->
+    <Color x:Key="ThumbColor">#28000000</Color>
+    <Color x:Key="ThumbHoverColor">#48000000</Color>
 
     <SolidColorBrush x:Key="PrimaryBrush" Color="{DynamicResource PrimaryColor}" />
     <SolidColorBrush x:Key="PrimaryHoverBrush" Color="{DynamicResource PrimaryHoverColor}" />
@@ -57,5 +60,7 @@
     <!-- 中性交互反馈（随深浅色模式切换） -->
     <SolidColorBrush x:Key="HoverBrush" Color="{DynamicResource HoverColor}" />
     <SolidColorBrush x:Key="PressedBrush" Color="{DynamicResource PressedColor}" />
+    <SolidColorBrush x:Key="ThumbBrush" Color="{DynamicResource ThumbColor}" />
+    <SolidColorBrush x:Key="ThumbHoverBrush" Color="{DynamicResource ThumbHoverColor}" />
 
 </ResourceDictionary>

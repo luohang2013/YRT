@@ -14,6 +14,7 @@ public class MainViewModel : ObservableObject
         new NavItem("主页", "\uE80F", new HomePage()),
         new NavItem("生成", "\uE710", new GeneratePage()),
         new NavItem("资源包", "\uE8B7", new PackManagerPage()),
+        new NavItem("编辑", "\uE70F", new EditPage()),
         new NavItem("分析", "\uE9D9", new AnalyzePage()),
         new NavItem("安装", "\uE896", new InstallPage()),
         new NavItem("设置", "\uE713", new SettingsPage()),
@@ -34,13 +35,30 @@ public class MainViewModel : ObservableObject
         _ = RunStartupChecksAsync();
     }
 
+    /// <summary>本次会话是否已由启动检查触发过更新弹窗（手动检查不重复弹）。</summary>
+    public static bool StartupUpdatePrompted;
+
     private static async Task RunStartupChecksAsync()
     {
         var s = Core.AppSettings.Instance;
+        // 更新与公告并行拉取，互不阻塞（公告卡能更快显示出来）
+        var tasks = new List<Task>();
         if (s.CheckUpdateOnStartup)
-            await Core.UpdateService.CheckForUpdateAsync(Core.UpdateService.OfficialRepo);
+        {
+            tasks.Add(Core.UpdateService.CheckForUpdateAsync(Core.UpdateService.OfficialRepo).ContinueWith(_ =>
+            {
+                // 启动检查发现新版本 → 弹出更新对话框（仅一次；手动检查走设置页卡片）
+                if (Core.UpdateService.UpdateAvailable && !StartupUpdatePrompted)
+                {
+                    StartupUpdatePrompted = true;
+                    System.Windows.Application.Current?.Dispatcher.BeginInvoke(() =>
+                        Views.UpdateDialogWindow.ShowIfPossible());
+                }
+            }));
+        }
         if (!string.IsNullOrWhiteSpace(s.AnnouncementUrl))
-            await Core.UpdateService.LoadAnnouncementAsync(s.AnnouncementUrl);
+            tasks.Add(Core.UpdateService.LoadAnnouncementAsync(s.AnnouncementUrl));
+        await Task.WhenAll(tasks);
     }
 
     public void Navigate(int index)

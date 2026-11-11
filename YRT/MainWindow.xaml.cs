@@ -16,6 +16,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = _vm;
         SourceInitialized += (_, _) => ApplyTitleBarTheme();
+        Loaded += (_, _) => PlayPageEnterAnimation();
     }
 
     [DllImport("dwmapi.dll")]
@@ -37,16 +38,16 @@ public partial class MainWindow : Window
         PlayPageEnterAnimation();
     }
 
-    /// <summary>页面切换动画：淡入 + 轻微上移（每个分页面进入时播放）。</summary>
+    /// <summary>页面切换动画：淡入 + 轻微上移回弹（每个分页面进入时播放）。</summary>
     private void PlayPageEnterAnimation()
     {
-        var fade = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(240))
+        var fade = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(280))
         {
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
         };
-        var shift = new DoubleAnimation(14, 0, TimeSpan.FromMilliseconds(260))
+        var shift = new DoubleAnimation(18, 0, TimeSpan.FromMilliseconds(320))
         {
-            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+            EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseOut },
         };
         PageHost.BeginAnimation(UIElement.OpacityProperty, fade);
         PageShift.BeginAnimation(TranslateTransform.YProperty, shift);

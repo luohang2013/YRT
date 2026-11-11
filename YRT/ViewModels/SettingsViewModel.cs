@@ -22,6 +22,8 @@ public class SettingsViewModel : ObservableObject
     public RelayCommand GetAnnouncementCommand { get; }
     public RelayCommand OpenReleaseCommand { get; }
     public RelayCommand OpenLanzouCommand { get; }
+    public RelayCommand OpenDataDirCommand { get; }
+    public RelayCommand ShowUpdateDialogCommand { get; }
     public RelayCommand ResetCommand { get; }
 
     // ---------------- 分类导航（图八：设置分类排放） ----------------
@@ -67,6 +69,8 @@ public class SettingsViewModel : ObservableObject
         GetAnnouncementCommand = new RelayCommand(_ => _ = GetAnnouncementAsync());
         OpenReleaseCommand = new RelayCommand(_ => OpenReleasePage());
         OpenLanzouCommand = new RelayCommand(_ => OpenLanzou());
+        OpenDataDirCommand = new RelayCommand(_ => OpenDataDir());
+        ShowUpdateDialogCommand = new RelayCommand(_ => Views.UpdateDialogWindow.ShowIfPossible());
         ResetCommand = new RelayCommand(_ => DoReset());
 
         // 订阅更新/公告结果（可能在后台线程触发，切回 UI 线程刷新）
@@ -90,6 +94,47 @@ public class SettingsViewModel : ObservableObject
     {
         get => AppSettings.Instance.OpenDirAfterInstall;
         set { AppSettings.Instance.OpenDirAfterInstall = value; AppSettings.Save(); OnPropertyChanged(); }
+    }
+
+    /// <summary>基岩安装前自动备份目标槽位</summary>
+    public bool BackupBeforeInstall
+    {
+        get => AppSettings.Instance.BackupBeforeInstall;
+        set { AppSettings.Instance.BackupBeforeInstall = value; AppSettings.Save(); OnPropertyChanged(); }
+    }
+
+    /// <summary>安装完成后弹出提示框</summary>
+    public bool NotifyAfterInstall
+    {
+        get => AppSettings.Instance.NotifyAfterInstall;
+        set { AppSettings.Instance.NotifyAfterInstall = value; AppSettings.Save(); OnPropertyChanged(); }
+    }
+
+    public string[] DeployConflictOptions { get; } = { "覆盖同名包", "自动重命名" };
+
+    /// <summary>Java 部署重名策略（0=覆盖 / 1=重命名）</summary>
+    public int DeployConflictIndex
+    {
+        get => AppSettings.Instance.DeployConflict == "Rename" ? 1 : 0;
+        set
+        {
+            AppSettings.Instance.DeployConflict = value == 1 ? "Rename" : "Overwrite";
+            AppSettings.Save();
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>当前数据目录（设置 → 安装 → 数据目录 展示）</summary>
+    public string DataDir => YRT.FirstRun.ResourceDeployer.DataDir;
+
+    private void OpenDataDir()
+    {
+        try
+        {
+            System.IO.Directory.CreateDirectory(DataDir);
+            System.Diagnostics.Process.Start("explorer.exe", DataDir);
+        }
+        catch { /* 打开失败忽略 */ }
     }
 
     // ---------------- 生成页默认值 ----------------
@@ -396,7 +441,8 @@ public class SettingsViewModel : ObservableObject
         // 通知全部属性刷新
         foreach (var p in new[]
                  {
-                     nameof(KillMc), nameof(OpenDirAfterInstall), nameof(DefaultOutDir),
+                     nameof(KillMc), nameof(OpenDirAfterInstall), nameof(BackupBeforeInstall),
+                     nameof(NotifyAfterInstall), nameof(DeployConflictIndex), nameof(DefaultOutDir),
                      nameof(PackNameTemplate), nameof(AutoMcmeta), nameof(ScanProgramDir),
                      nameof(ScanAllDrives), nameof(ScanDepth), nameof(Theme), nameof(CustomThemeColor),
                      nameof(IsLightMode), nameof(IsDarkMode), nameof(AppName), nameof(AppNameDisplay),

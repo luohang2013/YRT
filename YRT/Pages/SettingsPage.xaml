@@ -134,8 +134,26 @@
                                       IsChecked="{Binding KillMc}" />
                             <CheckBox Content="安装完成后自动打开目标目录" Margin="0,8,0,0"
                                       IsChecked="{Binding OpenDirAfterInstall}" />
+                            <CheckBox Content="基岩安装前自动备份目标槽位（存到数据目录 backup\）" Margin="0,8,0,0"
+                                      IsChecked="{Binding BackupBeforeInstall}" />
+                            <CheckBox Content="安装完成后弹出提示框" Margin="0,8,0,0"
+                                      IsChecked="{Binding NotifyAfterInstall}" />
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Java 部署重名时：" Style="{StaticResource FieldLabel}" />
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding DeployConflictOptions}"
+                                          SelectedIndex="{Binding DeployConflictIndex}" MinWidth="120"
+                                          Margin="8,0,0,0" />
+                                <TextBlock Grid.Column="2" Style="{StaticResource HintText}"
+                                           VerticalAlignment="Center" Margin="12,0,0,0"
+                                           Text="覆盖 = 直接替换旧包；自动重命名 = 保留旧包，新包加序号。" />
+                            </Grid>
                             <TextBlock Margin="0,8,0,0" Style="{StaticResource HintText}"
-                                       Text="影响「安装 → 网易基岩版」的一键安装流程；安装页中的勾选框会与此同步。" />
+                                       Text="影响「安装」页的一键安装 / 部署流程；安装页中的勾选框会与此同步。" />
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -216,6 +234,9 @@
                                         Visibility="{Binding HasLanzou, Converter={StaticResource BoolToVis}}" />
                                 <Button Content="GitHub 下载页" Padding="16,7" Margin="8,0,0,0" Cursor="Hand"
                                         Command="{Binding OpenReleaseCommand}"
+                                        Visibility="{Binding ShowRelease, Converter={StaticResource BoolToVis}}" />
+                                <Button Content="更新详情" Padding="16,7" Margin="8,0,0,0" Cursor="Hand"
+                                        Command="{Binding ShowUpdateDialogCommand}"
                                         Visibility="{Binding ShowRelease, Converter={StaticResource BoolToVis}}" />
                             </StackPanel>
                             <TextBlock Margin="0,8,0,0" Style="{StaticResource HintText}"
@@ -325,7 +346,7 @@
                             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                                 <Border Width="56" Height="56" CornerRadius="14"
                                         BorderBrush="{DynamicResource DividerBrush}" BorderThickness="1"
-                                        Background="White">
+                                        Background="{DynamicResource CardBrush}">
                                     <Image Source="pack://application:,,,/Resources/author.png" Stretch="Uniform" Margin="3" />
                                 </Border>
                                 <StackPanel VerticalAlignment="Center" Margin="14,0,0,0">

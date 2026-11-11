@@ -161,13 +161,45 @@ public static class PackDeployer
         return (total, used);
     }
 
-    /// <summary>Java 版部署：把 zip 复制进 resourcepacks 目录，返回目标完整路径</summary>
-    public static string DeployJava(string zip, string resourcepacksDir)
+    /// <summary>
+    /// Java 版部署：把 zip 复制进 resourcepacks 目录，返回目标完整路径。
+    /// conflict = "Rename" 时同名文件自动加序号；否则覆盖。
+    /// </summary>
+    public static string DeployJava(string zip, string resourcepacksDir, string conflict = "Overwrite")
     {
         Directory.CreateDirectory(resourcepacksDir);
-        var dst = Path.Combine(resourcepacksDir, Path.GetFileName(zip));
-        File.Copy(zip, dst, overwrite: true);
+        var name = Path.GetFileName(zip);
+        var dst = Path.Combine(resourcepacksDir, name);
+        if (!string.Equals(conflict, "Rename", StringComparison.Ordinal)) 
+        {
+            File.Copy(zip, dst, overwrite: true);
+            return dst;
+        }
+        var stem = Path.GetFileNameWithoutExtension(name);
+        var ext = Path.GetExtension(name);
+        for (var i = 2; File.Exists(dst); i++)
+            dst = Path.Combine(resourcepacksDir, $"{stem} ({i}){ext}");
+        File.Copy(zip, dst, overwrite: false);
         return dst;
+    }
+
+    /// <summary>
+    /// 安装前备份：把指定槽位目录打包为 zip 存入 backupDir，返回备份文件列表。
+    /// </summary>
+    public static List<string> BackupSlots(string packsRoot, IEnumerable<int> slots, string backupDir)
+    {
+        var made = new List<string>();
+        Directory.CreateDirectory(backupDir);
+        var stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        foreach (var s in slots)
+        {
+            var dir = Path.Combine(packsRoot, s.ToString());
+            if (!Directory.Exists(dir)) continue;
+            var zipPath = Path.Combine(backupDir, $"槽位{s}_{stamp}.zip");
+            PackPacker.PackDir(dir, zipPath);
+            made.Add(zipPath);
+        }
+        return made;
     }
 
     /// <summary>

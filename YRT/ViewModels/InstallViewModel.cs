@@ -234,7 +234,7 @@ public class InstallViewModel : ObservableObject
         }
         try
         {
-            var dst = PackDeployer.DeployJava(zipPath, SelectedJavaDir.Dir);
+            var dst = PackDeployer.DeployJava(zipPath, SelectedJavaDir.Dir, AppSettings.Instance.DeployConflict);
             Log($"[√] 已部署: {dst}");
             RefreshZips();
         }
@@ -469,6 +469,17 @@ public class InstallViewModel : ObservableObject
         }
         try
         {
+            // 安装前备份目标槽位（设置可关）
+            if (AppSettings.Instance.BackupBeforeInstall)
+            {
+                var backups = PackDeployer.BackupSlots(
+                    b.PacksRoot, slots,
+                    System.IO.Path.Combine(YRT.FirstRun.ResourceDeployer.DataDir, "backup"));
+                Log(backups.Count > 0
+                    ? $"[i] 已备份 {backups.Count} 个槽位 → 数据目录 backup\\"
+                    : "[i] 目标槽位为空，无需备份");
+            }
+
             // mcpack/zip 压缩档先物化为目录（带缓存复用，不改原文件）
             var baseDirs = new List<string>();
             if (BaseDir.Trim().Length > 0)
@@ -495,6 +506,9 @@ public class InstallViewModel : ObservableObject
                 try { System.Diagnostics.Process.Start("explorer.exe", b.PacksRoot); }
                 catch { /* 打开目录失败不影响安装结果 */ }
             }
+            if (AppSettings.Instance.NotifyAfterInstall)
+                System.Windows.MessageBox.Show(LastApply + "\n\n重启游戏后生效。", "安装完成",
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
