@@ -2,6 +2,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace YRT.Core;
 
@@ -57,7 +58,7 @@ public static class PackMeta
     /// <summary>把 description / pack_format 写回 zip 或目录，返回写入路径描述。</summary>
     public static string Write(string path, string description, int packFormat)
     {
-        var json = BuildJson(description, packFormat);
+        var json = BuildUpdatedJson(ReadRaw(path), description, packFormat);
         if (Directory.Exists(path))
         {
             var file = System.IO.Path.Combine(path, "pack.mcmeta");
@@ -76,6 +77,34 @@ public static class PackMeta
         using (var w = new StreamWriter(entry.Open(), new UTF8Encoding(false)))
             w.Write(json);
         return path + " → " + prefix + "pack.mcmeta";
+    }
+
+    private static string BuildUpdatedJson(string? raw, string description, int packFormat)
+    {
+        if (!string.IsNullOrWhiteSpace(raw))
+        {
+            try
+            {
+                if (JsonNode.Parse(raw) is JsonObject root)
+                {
+                    if (root["pack"] is not JsonObject pack)
+                    {
+                        if (root["pack"] is not null)
+                            return BuildJson(description, packFormat);
+                        pack = new JsonObject();
+                        root["pack"] = pack;
+                    }
+                    pack["pack_format"] = packFormat;
+                    pack["description"] = description ?? "";
+                    return root.ToJsonString();
+                }
+            }
+            catch (JsonException)
+            {
+                // 原文损坏时沿用默认结构生成有效 mcmeta。
+            }
+        }
+        return BuildJson(description, packFormat);
     }
 
     /// <summary>读取原文（zip/目录；不存在返回 null）。</summary>

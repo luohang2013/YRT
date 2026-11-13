@@ -243,7 +243,11 @@ public class PackManagerViewModel : ObservableObject
             : Path.Combine(AppContext.BaseDirectory, "output");
     }
 
-    private void Log(string s) => Logs.Add(s);
+    private void Log(string s)
+    {
+        Logs.Add(s);
+        AppLogger.Page("PackManager", s);
+    }
 
     private void Add(bool wantZip)
     {

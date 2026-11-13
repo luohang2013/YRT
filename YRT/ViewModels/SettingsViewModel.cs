@@ -23,6 +23,7 @@ public class SettingsViewModel : ObservableObject
     public RelayCommand OpenReleaseCommand { get; }
     public RelayCommand OpenLanzouCommand { get; }
     public RelayCommand OpenDataDirCommand { get; }
+    public RelayCommand OpenLogDirCommand { get; }
     public RelayCommand ShowUpdateDialogCommand { get; }
     public RelayCommand ResetCommand { get; }
 
@@ -70,6 +71,7 @@ public class SettingsViewModel : ObservableObject
         OpenReleaseCommand = new RelayCommand(_ => OpenReleasePage());
         OpenLanzouCommand = new RelayCommand(_ => OpenLanzou());
         OpenDataDirCommand = new RelayCommand(_ => OpenDataDir());
+        OpenLogDirCommand = new RelayCommand(_ => OpenLogDir());
         ShowUpdateDialogCommand = new RelayCommand(_ => Views.UpdateDialogWindow.ShowIfPossible());
         ResetCommand = new RelayCommand(_ => DoReset());
 
@@ -124,8 +126,9 @@ public class SettingsViewModel : ObservableObject
         }
     }
 
-    /// <summary>当前数据目录（设置 → 安装 → 数据目录 展示）</summary>
+    /// <summary>当前数据目录（设置 → 安装 → 数据与日志 展示）</summary>
     public string DataDir => YRT.FirstRun.ResourceDeployer.DataDir;
+    public string LogDir => AppLogger.LogDirectory;
 
     private void OpenDataDir()
     {
@@ -133,6 +136,16 @@ public class SettingsViewModel : ObservableObject
         {
             System.IO.Directory.CreateDirectory(DataDir);
             System.Diagnostics.Process.Start("explorer.exe", DataDir);
+        }
+        catch { /* 打开失败忽略 */ }
+    }
+
+    private void OpenLogDir()
+    {
+        try
+        {
+            System.IO.Directory.CreateDirectory(LogDir);
+            System.Diagnostics.Process.Start("explorer.exe", LogDir);
         }
         catch { /* 打开失败忽略 */ }
     }

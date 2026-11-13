@@ -121,6 +121,46 @@
                     </StackPanel>
                 </Border>
 
+                <!-- ============ 批量操作 ============ -->
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionTitle}" Text="批量打包 / 解包" />
+                        <TextBlock Style="{StaticResource HintText}" Margin="0,2,0,0"
+                                   Text="把多个材质目录或资源包加入同一列表，统一处理到上方输出目录。" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                            <Button Content="添加目录" Padding="12,6"
+                                    Command="{Binding AddBatchDirCommand}" />
+                            <Button Content="添加 zip / mcpack" Margin="8,0,0,0" Padding="12,6"
+                                    Command="{Binding AddBatchZipCommand}" />
+                            <Button Content="移除选中" Margin="8,0,0,0" Padding="12,6"
+                                    Command="{Binding RemoveBatchSourceCommand}"
+                                    CommandParameter="{Binding SelectedItem, ElementName=BatchSourceList}" />
+                            <Button Content="清空列表" Margin="8,0,0,0" Padding="12,6"
+                                    Command="{Binding ClearBatchSourcesCommand}" />
+                        </StackPanel>
+
+                        <ListBox x:Name="BatchSourceList" ItemsSource="{Binding BatchSources}"
+                                 Height="140" Margin="0,10,0,0"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" ToolTip="{Binding}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                            <Button Style="{StaticResource PrimaryButton}" Content="批量打包"
+                                    Padding="22,8" Command="{Binding BatchPackCommand}" />
+                            <Button Content="批量解包" Margin="10,0,0,0" Padding="22,8"
+                                    Command="{Binding BatchUnpackCommand}" />
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource HintText}" Margin="0,8,0,0"
+                                   Text="批量打包：目录生成同名 zip，已有压缩档复制到输出目录；批量解包：每个压缩档生成同名子目录。单项失败不会影响其余项目。" />
+                    </StackPanel>
+                </Border>
+
                 <!-- 打包说明 -->
                 <Border Style="{StaticResource Card}">
                     <StackPanel>

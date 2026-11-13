@@ -23,6 +23,9 @@ public class GenerateViewModel : ObservableObject
         "欢迎使用生成页。把材质目录打包为 Minecraft 可识别的 zip（条目路径强制正斜杠）；也可解包现有 zip 进行编辑。",
     };
 
+    /// <summary>批量源列表：目录或 zip/mcpack 路径，用于批量打包/解包。</summary>
+    public ObservableCollection<string> BatchSources { get; } = new();
+
     public string SrcDir { get => _srcDir; set => Set(ref _srcDir, value); }
     public string PackName { get => _packName; set => Set(ref _packName, value); }
     public string OutDir { get => _outDir; set => Set(ref _outDir, value); }
@@ -48,6 +51,12 @@ public class GenerateViewModel : ObservableObject
     public RelayCommand UnpackCommand { get; }
     public RelayCommand OpenOutDirCommand { get; }
     public RelayCommand ClearLogCommand { get; }
+    public RelayCommand AddBatchDirCommand { get; }
+    public RelayCommand AddBatchZipCommand { get; }
+    public RelayCommand RemoveBatchSourceCommand { get; }
+    public RelayCommand ClearBatchSourcesCommand { get; }
+    public RelayCommand BatchPackCommand { get; }
+    public RelayCommand BatchUnpackCommand { get; }
 
     public GenerateViewModel()
     {
@@ -58,6 +67,12 @@ public class GenerateViewModel : ObservableObject
         UnpackCommand = new RelayCommand(_ => DoUnpack());
         OpenOutDirCommand = new RelayCommand(_ => OpenOutDir());
         ClearLogCommand = new RelayCommand(_ => Logs.Clear());
+        AddBatchDirCommand = new RelayCommand(_ => AddBatchDir());
+        AddBatchZipCommand = new RelayCommand(_ => AddBatchZip());
+        RemoveBatchSourceCommand = new RelayCommand(p => BatchSources.Remove(p as string ?? ""));
+        ClearBatchSourcesCommand = new RelayCommand(_ => BatchSources.Clear());
+        BatchPackCommand = new RelayCommand(_ => DoBatchPack());
+        BatchUnpackCommand = new RelayCommand(_ => DoBatchUnpack());
     }
 
     private void BrowseIcon()
@@ -86,7 +101,114 @@ public class GenerateViewModel : ObservableObject
         return tpl.Length == 0 ? dirName : tpl.Replace("{name}", dirName);
     }
 
-    private void Log(string s) => Logs.Add(s);
+    private void Log(string s)
+    {
+        Logs.Add(s);
+        AppLogger.Page("Generate", s);
+    }
+
+    private void AddBatchDir()
+    {
+        var dlg = new OpenFolderDialog { Title = "选择要批量打包的材质目录（可多次添加）" };
+        if (dlg.ShowDialog() == true && !BatchSources.Contains(dlg.FolderName))
+            BatchSources.Add(dlg.FolderName);
+    }
+
+    private void AddBatchZip()
+    {
+        var dlg = new OpenFileDialog
+        {
+            Title = "选择要批量处理的资源包（可多选）",
+            Filter = "资源包 (*.zip;*.mcpack)|*.zip;*.mcpack|所有文件|*.*",
+            Multiselect = true,
+        };
+        if (dlg.ShowDialog() != true) return;
+        foreach (var f in dlg.FileNames)
+            if (!BatchSources.Contains(f)) BatchSources.Add(f);
+    }
+
+    private void DoBatchPack()
+    {
+        if (BatchSources.Count == 0) { Log("[!] 批量列表为空"); return; }
+        var outDir = OutDir.Trim();
+        if (outDir.Length == 0) { Log("[!] 请先设置输出目录"); return; }
+        try { Directory.CreateDirectory(outDir); } catch { /* 忽略 */ }
+
+        var ok = 0;
+        var fail = 0;
+        Log($"[i] 开始批量打包 {BatchSources.Count} 个源 → {outDir}");
+        foreach (var src in BatchSources.ToList())
+        {
+            try
+            {
+                if (Directory.Exists(src))
+                {
+                    var name = Path.GetFileName(src.TrimEnd(Path.DirectorySeparatorChar)) ?? "pack";
+                    var zip = Path.Combine(outDir, name + ".zip");
+                    var n = PackPacker.PackDir(src, zip, autoMcmeta: AutoMcmeta, packName: name);
+                    Log($"[√] {name}.zip（{n} 个文件）");
+                    ok++;
+                }
+                else if (PackPacker.IsPackArchive(src))
+                {
+                    // zip 直接复制到输出目录（已是压缩档，无需重新打包）
+                    var name = Path.GetFileName(src);
+                    var dest = Path.Combine(outDir, name);
+                    File.Copy(src, dest, overwrite: true);
+                    Log($"[√] 已复制 {name}");
+                    ok++;
+                }
+                else
+                {
+                    Log($"[!] 跳过（不是目录也不是 zip）: {src}");
+                    fail++;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"[!] 失败 {Path.GetFileName(src)}: {ex.Message}");
+                fail++;
+            }
+        }
+        Log($"[√] 批量打包完成：成功 {ok}，失败 {fail}");
+        LastOut = outDir;
+    }
+
+    private void DoBatchUnpack()
+    {
+        if (BatchSources.Count == 0) { Log("[!] 批量列表为空"); return; }
+        var outDir = OutDir.Trim();
+        if (outDir.Length == 0) { Log("[!] 请先设置输出目录"); return; }
+        try { Directory.CreateDirectory(outDir); } catch { /* 忽略 */ }
+
+        var ok = 0;
+        var fail = 0;
+        Log($"[i] 开始批量解包 {BatchSources.Count} 个源 → {outDir}");
+        foreach (var src in BatchSources.ToList())
+        {
+            try
+            {
+                if (!PackPacker.IsPackArchive(src))
+                {
+                    Log($"[!] 跳过（不是 zip/mcpack）: {src}");
+                    fail++;
+                    continue;
+                }
+                var name = Path.GetFileNameWithoutExtension(src);
+                var dest = Path.Combine(outDir, name);
+                var n = PackPacker.Unzip(src, dest);
+                Log($"[√] 解包 {name}（{n} 个文件）→ {dest}");
+                ok++;
+            }
+            catch (Exception ex)
+            {
+                Log($"[!] 解包失败 {Path.GetFileName(src)}: {ex.Message}");
+                fail++;
+            }
+        }
+        Log($"[√] 批量解包完成：成功 {ok}，失败 {fail}");
+        LastOut = outDir;
+    }
 
     private void BrowseSrc()
     {

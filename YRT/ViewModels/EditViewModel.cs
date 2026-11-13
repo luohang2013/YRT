@@ -103,7 +103,11 @@ public class EditViewModel : ObservableObject
         "欢迎使用编辑页。把资源包 zip / mcpack / 目录拖进本页，或点「扫描游戏」导入已安装的材质包；左侧可浏览文件、右侧编辑包详情，改完整包导出。",
     };
 
-    private void Log(string s) => Logs.Add(s);
+    private void Log(string s)
+    {
+        Logs.Add(s);
+        AppLogger.Page("Edit", s);
+    }
 
     // ---------------- 命令 ----------------
 

@@ -50,7 +50,7 @@ public class InstallViewModel : ObservableObject
             if (Set(ref _selectedJavaDir, value))
             {
                 SelectedZip = null;
-                OnPropertyChanged(nameof(Zips));
+                RefreshZips();
                 OnPropertyChanged(nameof(OptionsVisible));
                 LoadOptions();
             }
@@ -175,7 +175,11 @@ public class InstallViewModel : ObservableObject
         ClearLogCommand = new RelayCommand(_ => Logs.Clear());
     }
 
-    private void Log(string s) => Logs.Add(s);
+    private void Log(string s)
+    {
+        Logs.Add(s);
+        AppLogger.Page("Install", s);
+    }
 
     // ---------------- Java 版实现 ----------------
 

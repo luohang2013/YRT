@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
+using YRT.Core;
 using YRT.FirstRun;
 using YRT.Theme;
 using YRT.Views;
@@ -16,13 +17,20 @@ public partial class App : Application
 
         DispatcherUnhandledException += (_, args) =>
         {
+            AppLogger.Error("UI", "未处理的界面异常", args.Exception);
             Log($"DispatcherUnhandledException: {args.Exception}");
             MessageBox.Show(args.Exception.ToString(), "YRT 错误",
                 MessageBoxButton.OK, MessageBoxImage.Error);
             args.Handled = true;
         };
         AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+        {
+            if (args.ExceptionObject is Exception ex)
+                AppLogger.Error("AppDomain", "未处理的应用域异常", ex);
+            else
+                AppLogger.Error("AppDomain", $"未处理的应用域异常：{args.ExceptionObject}");
             Log($"AppDomain.UnhandledException: {args.ExceptionObject}");
+        };
 
         try
         {

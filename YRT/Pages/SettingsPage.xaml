@@ -156,6 +156,20 @@
                                        Text="影响「安装」页的一键安装 / 部署流程；安装页中的勾选框会与此同步。" />
                         </StackPanel>
                     </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource SectionTitle}" Text="数据与日志" />
+                            <TextBlock Margin="0,8,0,0" Style="{StaticResource HintText}"
+                                       Text="操作日志按天保存，清空页面日志不会删除日志文件。" />
+                            <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                <Button Content="打开数据目录" Padding="16,7" Cursor="Hand"
+                                        Command="{Binding OpenDataDirCommand}" ToolTip="{Binding DataDir}" />
+                                <Button Content="打开日志目录" Padding="16,7" Margin="8,0,0,0" Cursor="Hand"
+                                        Command="{Binding OpenLogDirCommand}" ToolTip="{Binding LogDir}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
 
                 <!-- ===== 生成 ===== -->
@@ -329,6 +343,9 @@
                             <TextBlock Margin="0,12,0,0" TextWrapping="Wrap" LineHeight="20"
                                        Style="{StaticResource HintText}"
                                        Text="这是一款面向 Minecraft 玩家的资源包一站式工具：把零散的材质目录打包成可安装的 zip；把多个资源包按分类混搭（方块贴图取 A 包、音效取 B 包）；分析任意资源包的结构、占用与健康度；并支持 Java 版与网易基岩版一键部署。本项目使用 C# / WPF (.NET 8) 编写，打包逻辑参考自同作者的 RustPackGen，界面交互致敬 PCL2。" />
+                            <TextBlock Margin="0,8,0,0" TextWrapping="Wrap" LineHeight="20"
+                                       Style="{StaticResource HintText}"
+                                       Text="项目说明：本项目为 AI 辅助开发项目，由 YiHangCT 设计与维护。" />
                         </StackPanel>
                     </Border>
 

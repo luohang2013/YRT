@@ -1,60 +1,34 @@
 # YRT — Minecraft 资源包工具箱
 
-> 程序名支持在设置页自定义（默认「YHCT 的资源包工具箱」）
+基于 .NET 8 / WPF 的 Windows 资源包工具，默认程序名为「YHCT 的资源包工具箱」。
 
-把 Minecraft 资源包的 **生成 · 混搭 · 分析 · 安装** 做成一站式流程的 Windows 桌面工具（WPF，.NET 8，win-x64 单文件，免安装解压即用）。
+## 功能
 
-## 功能一览
+- **生成**：材质目录打包或解包，自动处理 `pack.mcmeta` 与 `pack.png`。
+- **混搭**：按分类组合多个资源包，保存和恢复混搭方案。
+- **编辑 / 分析**：浏览与修改包内容，统计结构、占用并诊断问题。
+- **安装**：部署 Java 版与网易基岩版资源包，支持 options.txt 编辑和安装前备份。
+- **设置 / 更新**：主题、程序名、操作日志、GitHub Release 更新与公告。
 
-| 模块 | 说明 |
-|---|---|
-| 生成 | 材质目录打包为 zip（自动 pack.mcmeta / pack.png），或解包现有 zip 编辑 |
-| 资源包 | 多包混搭：贴图取 A 包、音效取 B 包，按分类聚合导出；支持保存/载入混搭方案（.yrtplan），包库启动自动恢复 |
-| 分析 | 解析资源包结构、分类占用统计与诊断 |
-| 安装 | Java 版 / 网易基岩版一键部署与启用；Java 版附带 options.txt 可视化编辑器（亮度、渲染距离、全屏等，保存前自动备份） |
-| 设置 | 4 组主题色 + 自定义取色、浅色/深色模式、程序名自定义 |
-| 更新 | GitHub Release 检测更新 + 公告展示（主页公告卡） |
-
-全站支持拖拽操作，`.mcpack`（网易基岩版压缩档）同样全链路可用。
+支持拖拽及 `.zip`、`.mcpack`、资源包目录。
 
 ## 下载
 
-- **GitHub Releases**（推荐）：https://github.com/luohang2013/YRT/releases
-- **蓝奏云备用**：https://wwbrw.lanzouq.com/b00ybjxczg （提取码 `YRT`）
-
-软件内也会自动提示新版本：设置 → 更新 → 检查更新。
-
-> 更新源内置在程序中（不可配置），确保更新提示永远指向官方仓库，杜绝被篡改注入的风险。
-
-## 常见问题
-
-**双击 exe 没有反应？**
-程序未签名，杀毒软件（如 360 主动防御）可能静默拦截。请打开杀软的「拦截记录 / 恢复区」放行，并将程序所在目录加入信任区。程序拷贝到新位置后可能被再次拦截，同样处理即可。
+- [GitHub Releases](https://github.com/luohang2013/YRT/releases)
+- [蓝奏云备用](https://wwbrw.lanzouq.com/b00ybjxczg)，提取码：`YRT`
 
 ## 从源码构建
 
+需要 .NET 8 SDK，在仓库根目录执行：
+
 ```powershell
-dotnet publish src/YRT/YRT.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o dist
+dotnet publish YRT/YRT.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o dist
 ```
 
-要求 .NET 8 SDK，产物为单个 `YRT.exe`。
+产物为免安装的 `YRT.exe`。操作日志可从“设置 → 安装 → 数据与日志”打开。
 
-## 发布新版（维护者）
-
-1. 更新 `src/YRT/YRT.csproj` 中的 `<Version>`（如 `0.5.0`）
-2. 构建 → 打包 zip
-3. `gh release create v0.5.0 YRT-v0.5.0.zip --title "..." --notes-file notes.md`
-4. tag 必须带版本号（`v0.5.0` / `0.5.0` 均可），用户端会比较 tag 与本地版本
-
-## 公告
-
-公告源是一个 Gist / 任意公开文本链接，支持纯文本或 JSON：
-
-```json
-{"title": "标题", "date": "2026-11-11", "content": "公告内容"}
-```
-
-改完保存，用户端主页公告卡刷新即生效。
+> 程序未签名，杀毒软件可能拦截；如双击无反应，请检查拦截记录并添加信任。
 
 ---
-*仅供学习交流使用，与 Mojang / 网易官方无关。*
+
+仅供学习交流使用，与 Mojang / 网易官方无关。

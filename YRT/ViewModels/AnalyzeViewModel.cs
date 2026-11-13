@@ -57,7 +57,11 @@ public class AnalyzeViewModel : ObservableObject
         ExportReportCommand = new RelayCommand(_ => ExportReport());
     }
 
-    private void Log(string s) => Logs.Add(s);
+    private void Log(string s)
+    {
+        Logs.Add(s);
+        AppLogger.Page("Analyze", s);
+    }
 
     private void Browse(bool wantZip)
     {

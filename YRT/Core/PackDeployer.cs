@@ -146,10 +146,20 @@ public static class PackDeployer
         {
             var gameSlot = Path.Combine(packsRoot, s.ToString());
             // 每个槽位先放基础包（按 basePacks 顺序取第一个存在的）
-            var baseDir = basePacks.FirstOrDefault(Directory.Exists)
-                ?? throw new DirectoryNotFoundException("没有可用的基础包目录");
-            var n = ReplaceDir(baseDir, gameSlot);
-            total += n;
+            var baseDir = basePacks.FirstOrDefault(Directory.Exists);
+            if (baseDir is not null)
+            {
+                total += ReplaceDir(baseDir, gameSlot);
+            }
+            else if (basePacks.Count > 0)
+            {
+                throw new DirectoryNotFoundException("没有可用的基础包目录");
+            }
+            else
+            {
+                // 仅添加材质包时保留现有槽位内容。
+                Directory.CreateDirectory(gameSlot);
+            }
             // 合并所有材质包
             foreach (var c in commonPacks)
             {
